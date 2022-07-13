@@ -20,6 +20,7 @@ An library which allows you to easily interface with the [Invidious](https://git
 ## Output
 
 <img src="screenshots/screenshot1.gif"/>
+<img src="screenshots/screenshot4.gif" />
 
 ## Executing a Search
 ```c#
