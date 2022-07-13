@@ -19,7 +19,7 @@ An library which allows you to easily interface with the [Invidious](https://git
 
 ## Output
 
-<img src="screenshots/screenshot1.gif" width="300" />
+<img src="screenshots/screenshot1.gif"/>
 
 ## Executing a Search
 ```c#
@@ -57,10 +57,10 @@ An library which allows you to easily interface with the [Invidious](https://git
 
 ## Output
 
-<img src="screenshots/screenshot2.gif" width="300" />
+<img src="screenshots/screenshot2.gif" />
 
 ## When reaching out to an instance fails
 
 It sends a request to another instance as long as the amount of failures is within the failure tolerance (default 5).
 
-<img src="screenshots/screenshot3.gif" width="300" />
+<img src="screenshots/screenshot3.gif" />
