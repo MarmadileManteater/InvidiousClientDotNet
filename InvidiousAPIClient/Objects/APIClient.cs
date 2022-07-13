@@ -36,7 +36,7 @@ namespace InvidiousAPIClient.Objects
         /// 
         /// </summary>
         /// <param name="cacheEnabled">whether or not to cache responses from the invidious API will hit up the same url over an over again</param>
-        public APIClient(bool cacheEnabled)
+        public APIClient(bool cacheEnabled = true)
         {
             _httpResponseCache = new Dictionary<string, HttpResponseMessage>();
             CacheEnabled = cacheEnabled;
