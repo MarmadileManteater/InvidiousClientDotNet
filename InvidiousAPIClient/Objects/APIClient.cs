@@ -240,7 +240,7 @@ namespace InvidiousAPIClient.Objects
             IList<string> apis = await GetInvidiousAPIs();
             if (server == null)
             {
-                Random random = new Random();
+                Random random = new();
                 int randomIndex = random.Next(apis.Count);
                 server = apis[randomIndex];
             }
@@ -306,7 +306,7 @@ namespace InvidiousAPIClient.Objects
 
         public async Task<List<string>> FetchVideoFormatTags(string videoId)
         {
-            List<string> itags = new List<string>();
+            List<string> itags = new();
             JObject videoObject = await FetchJSON(videoId, "videos", new string[] { "formatStreams", "adaptiveFormats" });
             JArray? formatStreams = videoObject["formatStreams"]?.Value<JArray>();
             JArray? adaptiveFormats = videoObject["adaptiveFormats"]?.Value<JArray>();
@@ -335,7 +335,7 @@ namespace InvidiousAPIClient.Objects
 
         public async Task<List<string>> GetInvidiousAPIs(Func<InvidiousInstance, bool>? condition = null)
         {
-            List<string> response = new List<string>();
+            List<string> response = new();
             HttpResponseMessage instancesResponse = await Fetch("https://api.invidious.io/instances.json?pretty=1&sort_by=type,users");
             // If we get an error response, something is probably wrong.
             instancesResponse.EnsureSuccessStatusCode();
