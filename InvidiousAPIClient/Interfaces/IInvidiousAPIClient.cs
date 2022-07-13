@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MarmadileManteater.InvidiousClient.Enums;
 using MarmadileManteater.InvidiousClient.Objects.Data;
 using Newtonsoft.Json.Linq;
 
@@ -155,5 +156,31 @@ namespace MarmadileManteater.InvidiousClient.Interfaces
         /// <param name="saveDirectory">the directory to save to</param>
         /// <param name="condition">the condition by which to select the first matching video to download</param>
         void DownloadFirstMatchingVideoFormatSync(string videoId, string saveDirectory, Func<FormatStream, bool>? condition = null);
+        /// <summary>
+        /// Returns a list of search results JObjects
+        /// </summary>
+        /// <param name="query">a search query</param>
+        /// <param name="page"></param>
+        /// <param name="sortBy"></param>
+        /// <param name="date"></param>
+        /// <param name="duration"></param>
+        /// <param name="searchType"></param>
+        /// <param name="features"></param>
+        /// <param name="region"></param>
+        /// <returns></returns>
+        Task<List<JObject>> Search(string query, int page = 0, SortBy? sortBy = null, DateRange? date = null, Duration? duration = null, SearchType? searchType = null, Feature[]? features = null, string? region = null);
+        /// <summary>
+        /// Returns a list of search results JObjects
+        /// </summary>
+        /// <param name="query">a search query</param>
+        /// <param name="page"></param>
+        /// <param name="sortBy"></param>
+        /// <param name="date"></param>
+        /// <param name="duration"></param>
+        /// <param name="searchType"></param>
+        /// <param name="features"></param>
+        /// <param name="region"></param>
+        /// <returns></returns>
+        List<JObject> SearchSync(string query, int page = 0, SortBy? sortBy = null, DateRange? date = null, Duration? duration = null, SearchType? searchType = null, Feature[]? features = null, string? region = null);
     }
 }

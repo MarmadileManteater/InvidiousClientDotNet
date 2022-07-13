@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MarmadileManteater.InvidiousClient.Enums;
 using MarmadileManteater.InvidiousClient.Extensions;
 using MarmadileManteater.InvidiousClient.Interfaces;
 using MarmadileManteater.InvidiousClient.Objects.Data;
@@ -280,12 +281,18 @@ namespace MarmadileManteater.InvidiousClient.Objects
                 path = type + "/" + urlPath;
             }
 
+            char startCharacter = '?';
+            if (path.Contains('?'))
+            {
+                startCharacter = '&';
+            }
             if (fields != null)
             {
-                path += "?fields=" + string.Join(',', fields) + "&pretty=1";
+
+                path += startCharacter + "fields=" + string.Join(',', fields) + "&pretty=1";
             } else
             {
-                path += "?pretty=1";
+                path += startCharacter + "pretty=1";
             
             }
 
@@ -450,6 +457,147 @@ namespace MarmadileManteater.InvidiousClient.Objects
         public InvidiousPlaylist FetchPlaylistByIdSync(string id, string[]? fields = null)
         {
             Task<InvidiousPlaylist> task = FetchPlaylistById(id, fields);
+            task.Wait();
+            return task.Result;
+        }
+
+        public async Task<List<JObject>> Search(string query, int page = 0, SortBy? sortBy = null, DateRange? date = null, Duration? duration = null, SearchType? searchType = null, Feature[]? features = null, string? region = null)
+        {
+            List<JObject> result = new();
+            string queryInterjection = "";
+            if (sortBy != null)
+            {
+                queryInterjection += "&sort_by=";
+                switch(sortBy)
+                {
+                    case SortBy.Relevance:
+                        queryInterjection += "relevance";
+                        break;
+                    case SortBy.Rating:
+                        queryInterjection += "rating";
+                        break;
+                    case SortBy.UploadDate:
+                        queryInterjection += "upload_date";
+                        break;
+                    case SortBy.ViewCount:
+                        queryInterjection += "view_count";
+                        break;
+                }
+            }
+            if (date != null)
+            {
+                queryInterjection += "&date=";
+                switch (date)
+                {
+                    case DateRange.LastHour:
+                        queryInterjection += "hour";
+                        break;
+                    case DateRange.LastDay:
+                        queryInterjection += "day";
+                        break;
+                    case DateRange.LastWeek:
+                        queryInterjection += "week";
+                        break;
+                    case DateRange.LastMonth:
+                        queryInterjection += "month";
+                        break;
+                    case DateRange.LastYear:
+                        queryInterjection += "year";
+                        break;
+                }
+            }
+            if (duration != null)
+            {
+                queryInterjection += "&duration=";
+                switch (duration)
+                {
+                    case Duration.Short:
+                        queryInterjection += "short";
+                        break;
+                    case Duration.Long:
+                        queryInterjection += "long";
+                        break;
+                }
+            }
+            if (searchType != null)
+            {
+                queryInterjection += "&type=";
+                switch (searchType)
+                {
+                    case SearchType.Video:
+                        queryInterjection += "video";
+                        break;
+                    case SearchType.Playlist:
+                        queryInterjection += "playlist";
+                        break;
+                    case SearchType.Channel:
+                        queryInterjection += "channel";
+                        break;
+                    case SearchType.All:
+                        queryInterjection += "all";
+                        break;
+                }
+            }
+            if (features != null)
+            {
+                queryInterjection += "&features=";
+                foreach (Feature feature in features)
+                {
+                    switch (feature)
+                    {
+                        case Feature.HD:
+                            queryInterjection += "hd";
+                            break;
+                        case Feature.Subtitles:
+                            queryInterjection += "subtitles";
+                            break;
+                        case Feature.CreativeCommons:
+                            queryInterjection += "creative_commons";
+                            break;
+                        case Feature._3d:
+                            queryInterjection += "3D";
+                            break;
+                        case Feature.Live:
+                            queryInterjection += "live";
+                            break;
+                        case Feature.Purchased:
+                            queryInterjection += "purchased";
+                            break;
+                        case Feature._4k:
+                            queryInterjection += "4k";
+                            break;
+                        case Feature._360:
+                            queryInterjection += "360";
+                            break;
+                        case Feature.Location:
+                            queryInterjection += "location";
+                            break;
+                        case Feature.HDR:
+                            queryInterjection += "hdr";
+                            break;
+                    }
+                    queryInterjection += ",";
+                }
+                queryInterjection = queryInterjection.Substring(0, queryInterjection.Length - 1);// trim the last comma
+            }
+            if (region != null)
+            {
+                queryInterjection += "&region=" + region;
+            }
+            JToken response = await FetchJSON("?q=" + Uri.EscapeDataString(query) + "&page=" + page.ToString() + queryInterjection, "search");
+            JArray? searchList = response.Value<JArray>();
+            if (searchList != null)
+            {
+                foreach (JObject searchItem in searchList)
+                {
+                    result.Add(searchItem);
+                }
+            }
+            return result;
+        }
+        public List<JObject> SearchSync(string query, int page = 0, SortBy? sortBy = null, DateRange? date = null, Duration? duration = null, SearchType? searchType = null, Feature[]? features = null, string? region = null)
+        {
+            Task<List<JObject>> task = Search(query, page, sortBy, date, duration, searchType, features);
             task.Wait();
             return task.Result;
         }

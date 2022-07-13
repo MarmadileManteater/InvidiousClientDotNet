@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MarmadileManteater.InvidiousClient.Objects.Data;
 using Newtonsoft.Json.Linq;
 
 namespace MarmadileManteater.InvidiousClient.Extensions
@@ -36,6 +37,32 @@ namespace MarmadileManteater.InvidiousClient.Extensions
             }
             return resultDict;
 
+        }
+
+        public static bool IsVideo(this JObject jObject)
+        {
+            return jObject?["type"]?.Value<string>() == "video";
+        }
+        public static InvidiousChannelVideo ToVideo(this JObject jObject)
+        {
+            return new InvidiousChannelVideo(jObject);
+        }
+        public static bool IsPlaylist(this JObject jObject)
+        {
+            return jObject?["type"]?.Value<string>() == "playlist";
+        }
+        public static InvidiousPlaylist ToPlaylist(this JObject jObject)
+        {
+            return new InvidiousPlaylist(jObject);
+        }
+
+        public static bool IsChannel(this JObject jObject)
+        {
+            return jObject?["type"]?.Value<string>() == "channel";
+        }
+        public static InvidiousChannel ToChannel(this JObject jObject)
+        {
+            return new InvidiousChannel(jObject);
         }
     }
 }
