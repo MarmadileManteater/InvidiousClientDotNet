@@ -11,7 +11,7 @@ namespace MarmadileManteater.InvidiousClient.Objects.Data
     public class InvidiousInstanceStats
     {
         private readonly JObject _data;
-        public InvidiousInstanceStats(JObject? instanceObject)
+        internal InvidiousInstanceStats(JObject? instanceObject)
         {
             if (instanceObject == null)
             {

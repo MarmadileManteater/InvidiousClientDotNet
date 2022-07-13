@@ -15,6 +15,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
     {
         private readonly Dictionary<string, HttpResponseMessage> _httpResponseCache;
         private readonly int _chunkSize;
+        private readonly int _failureTolerance = 5;
         private readonly ILogger _logger;
         private int failedAttempts = 0;
         public readonly bool CacheEnabled;
@@ -121,24 +122,20 @@ namespace MarmadileManteater.InvidiousClient.Objects
 
         public async Task DownloadAllMatchingVideoFormats(string videoId, string saveDirectory, Func<FormatStream, bool>? condition = null)
         {
-            JObject videoObject = await FetchJSON(videoId, "videos", new string[] { "formatStreams", "adaptiveFormats" });
-            JArray? formatStreams = videoObject["formatStreams"]?.Value<JArray>();
-            JArray? adaptiveFormats = videoObject["adaptiveFormats"]?.Value<JArray>();
-            if (formatStreams != null && adaptiveFormats != null)
+            InvidiousVideo video = await FetchVideoById(videoId, new string[] { "formatStreams", "adaptiveFormats" });
+            foreach (FormatStream stream in video.FormatStreams)
             {
-                // add the apdative formats to the format streams
-                formatStreams = formatStreams.ArrayJoin(adaptiveFormats);
-
-                foreach (JObject jObject in formatStreams)
+                if (condition == null || condition(stream))
                 {
-                    FormatStream stream = new FormatStream(jObject);
-                    if (condition == null || condition(stream))
+                    string url = stream.Url;
+                    string mimeType = stream.Type;
+
+                    string fileType = mimeType.Split("/")[1].Split(";")[0];
+
+                    bool connectionFailed = false;
+
+                    do
                     {
-                        string url = stream.Url;
-                        string mimeType = stream.Type;
-
-                        string fileType = mimeType.Split("/")[1].Split(";")[0];
-
                         HttpResponseMessage response = await Fetch(url);
                         // Save the byte array to the save directory
                         try
@@ -166,31 +163,49 @@ namespace MarmadileManteater.InvidiousClient.Objects
                         var isMoreToRead = true;
                         await _logger.LogInfo("Downloading stream with itag of \"" + stream.Itag + "\" to the file:\r\n" + fileName);
                         IProgress<double> progress = _logger.GetProgressInterface();
-                        do
+                        try
                         {
-                            var read = await contentStream.ReadAsync(buffer, 0, buffer.Length);
-                            if (read == 0)
+                            do
                             {
-                                isMoreToRead = false;
-                            }
-                            else
-                            {
-                                await fileStream.WriteAsync(buffer, 0, read);
-
-                                totalRead += read;
-                                totalReads += 1;
-                                if (contentLength != null)
+                                var read = await contentStream.ReadAsync(buffer, 0, buffer.Length);
+                                if (read == 0)
                                 {
-                                    double? progressReport = ((double)totalRead) / contentLength;
-                                    if (progressReport != null)
+                                    isMoreToRead = false;
+                                }
+                                else
+                                {
+                                    await fileStream.WriteAsync(buffer, 0, read);
+
+                                    totalRead += read;
+                                    totalReads += 1;
+                                    if (contentLength != null)
                                     {
-                                        progress.Report(progressReport.Value);
+                                        double? progressReport = ((double)totalRead) / contentLength;
+                                        if (progressReport != null)
+                                        {
+                                            progress.Report(progressReport.Value);
+                                        }
                                     }
                                 }
-                            }
 
-                        } while (isMoreToRead);
-                        await _logger.Trace("Finished downloading!");
+                            } while (isMoreToRead);
+                            await _logger.Trace("Finished downloading!");
+                            failedAttempts = 0;
+                            connectionFailed = false;
+                        }
+                        catch (Exception exception)
+                        {
+                            await _logger.LogError("An error occured while downloading.", exception);
+                            failedAttempts++;
+                            connectionFailed = true;
+                            Thread.Sleep(1);
+                            await _logger.Trace("Refetching a new stream url for video id: " + videoId);
+                            video = await FetchVideoById(videoId, new string[] { "formatStreams", "adaptiveFormats" });
+                        }
+                    } while (connectionFailed && failedAttempts < _failureTolerance);
+                    if (failedAttempts > _failureTolerance)
+                    {
+                        throw new Exception("Failed to download " + _failureTolerance + " consecutive times!");
                     }
                 }
             }
@@ -239,7 +254,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
             return;
         }
 
-        public async Task<JObject> FetchJSON(string urlPath, string type = "videos", string[]? fields = null, string? server = null)
+        public async Task<JToken> FetchJSON(string urlPath, string type = "videos", string[]? fields = null, string? server = null)
         {
             IList<string> apis = await GetInvidiousAPIs();
             if (server == null)
@@ -275,7 +290,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
             }
 
             HttpResponseMessage response = await Fetch(server + "/api/v1/" + path);
-            while (!response.IsSuccessStatusCode && failedAttempts < 5)
+            while (!response.IsSuccessStatusCode && failedAttempts < _failureTolerance)
             {
                 try
                 {
@@ -290,10 +305,10 @@ namespace MarmadileManteater.InvidiousClient.Objects
                     failedAttempts++;
                 }
             }
-            // if is is still not a success code we have failed 5 consecutive times.
+            // if is is still not a success code we have failed a certain number of consecutive times.
             response.EnsureSuccessStatusCode();
             string content = await response.Content.ReadAsStringAsync();
-            JObject? result = JsonConvert.DeserializeObject<JObject>(content);
+            JToken? result = JsonConvert.DeserializeObject<JToken>(content);
             if (result == null)
             {
                 throw new Exception("Response was null");
@@ -301,9 +316,9 @@ namespace MarmadileManteater.InvidiousClient.Objects
             return result;
         }
 
-        public JObject FetchJSONSync(string urlPath, string type = "videos", string[]? fields = null, string? server = null)
+        public JToken FetchJSONSync(string urlPath, string type = "videos", string[]? fields = null, string? server = null)
         {
-            Task<JObject> task = FetchJSON(urlPath, type, fields, server);
+            Task<JToken> task = FetchJSON(urlPath, type, fields, server);
             task.Wait();
             return task.Result;
         }
@@ -311,21 +326,13 @@ namespace MarmadileManteater.InvidiousClient.Objects
         public async Task<List<string>> FetchVideoFormatTags(string videoId)
         {
             List<string> itags = new();
-            JObject videoObject = await FetchJSON(videoId, "videos", new string[] { "formatStreams", "adaptiveFormats" });
-            JArray? formatStreams = videoObject["formatStreams"]?.Value<JArray>();
-            JArray? adaptiveFormats = videoObject["adaptiveFormats"]?.Value<JArray>();
-            if (formatStreams != null && adaptiveFormats != null)
+            InvidiousVideo videoObject = await FetchVideoById(videoId, new string[] { "formatStreams", "adaptiveFormats" });
+            foreach (FormatStream streamObject in videoObject.FormatStreams)
             {
-                // add the apdative formats to the format streams
-                formatStreams = formatStreams.ArrayJoin(adaptiveFormats);
-                foreach (JObject jObject in formatStreams)
+                string itag = streamObject.Itag;
+                if (itag != "")
                 {
-                    FormatStream streamObject = new(jObject);
-                    string itag = streamObject.Itag;
-                    if (itag != "")
-                    {
-                        itags.Add(itag);
-                    }
+                    itags.Add(itag);
                 }
             }
             return itags;
@@ -383,6 +390,66 @@ namespace MarmadileManteater.InvidiousClient.Objects
         public List<string> GetInvidiousAPIsSync(Func<InvidiousInstance, bool>? condition = null)
         {
             Task<List<string>> task = GetInvidiousAPIs(condition);
+            task.Wait();
+            return task.Result;
+        }
+
+        public async Task<InvidiousVideo> FetchVideoById(string id, string[]? fields = null)
+        {
+            JObject? videoObject = (await FetchJSON(id, "videos", fields))?.Value<JObject>();
+            return new InvidiousVideo(videoObject);
+        }
+
+        public InvidiousVideo FetchVideoByIdSync(string id, string[]? fields = null)
+        {
+            Task<InvidiousVideo> task = FetchVideoById(id, fields);
+            task.Wait();
+            return task.Result;
+        }
+
+        public async Task<InvidiousChannel> FetchChannelById(string id, string[]? fields = null)
+        {
+            JObject? channelObject = (await FetchJSON(id, "channels", fields))?.Value<JObject>();
+            return new InvidiousChannel(channelObject);
+        }
+
+        public InvidiousChannel FetchChannelByIdSync(string id, string[]? fields = null)
+        {
+            Task<InvidiousChannel> task = FetchChannelById(id, fields);
+            task.Wait();
+            return task.Result;
+        }
+
+        public async Task<List<InvidiousChannelVideo>> FetchVideosByChannelId(string channelId)
+        {
+            List<InvidiousChannelVideo> result = new();
+            JArray? channelList = (await FetchJSON(channelId + "/videos", "channels")).Value<JArray>();
+            if (channelList != null)
+            {
+                foreach (JObject video in channelList)
+                {
+                    result.Add(new InvidiousChannelVideo(video));
+                }
+            }
+            return result;
+        }
+
+        public List<InvidiousChannelVideo> FetchVideosByChannelIdSync(string channelId)
+        {
+            Task<List<InvidiousChannelVideo>> task = FetchVideosByChannelId(channelId);
+            task.Wait();
+            return task.Result;
+        }
+
+        public async Task<InvidiousPlaylist> FetchPlaylistById(string id, string[]? fields = null)
+        {
+            JObject? playlistObject = (await FetchJSON(id, "playlists", fields))?.Value<JObject>();
+            return new InvidiousPlaylist(playlistObject);
+        }
+
+        public InvidiousPlaylist FetchPlaylistByIdSync(string id, string[]? fields = null)
+        {
+            Task<InvidiousPlaylist> task = FetchPlaylistById(id, fields);
             task.Wait();
             return task.Result;
         }

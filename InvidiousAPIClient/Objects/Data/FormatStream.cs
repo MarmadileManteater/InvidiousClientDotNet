@@ -11,7 +11,7 @@ namespace MarmadileManteater.InvidiousClient.Objects.Data
     public class FormatStream
     {
         private readonly JObject _data;
-        public FormatStream(JObject stream)
+        internal FormatStream(JObject stream)
         {
             _data = stream;
         }
@@ -87,18 +87,6 @@ namespace MarmadileManteater.InvidiousClient.Objects.Data
                 return "";
             }
         }
-        public virtual string Quality {
-            get
-            {
-                string? result = _data["quality"]?.Value<string>();
-                if (result != null)
-                {
-                    return result;
-                }
-                return "";
-            }
-        }
-
         public virtual int Fps
         {
             get

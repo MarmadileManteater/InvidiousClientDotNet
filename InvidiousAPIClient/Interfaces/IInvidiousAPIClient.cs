@@ -30,7 +30,7 @@ namespace MarmadileManteater.InvidiousClient.Interfaces
         /// <param name="fields">a list of fields which will be retrieved from the API (returns all fields if null is given)</param>
         /// <param name="server">a server to specifically make the API call to, if not given, will pick one randomly from getInvidiousAPIs</param>
         /// <returns>the JSON response from the invidious API</returns>
-        Task<JObject> FetchJSON(string urlPath, string type = "videos", string[]? fields = null, string? server = null);
+        Task<JToken> FetchJSON(string urlPath, string type = "videos", string[]? fields = null, string? server = null);
         /// <summary>
         /// Fetches a JSON response from the Invidious API
         /// </summary>
@@ -39,7 +39,61 @@ namespace MarmadileManteater.InvidiousClient.Interfaces
         /// <param name="fields">a list of fields which will be retrieved from the API (returns all fields if null is given)</param>
         /// <param name="server">a server to specifically make the API call to, if not given, will pick one randomly from getInvidiousAPIs</param>
         /// <returns>the JSON response from the invidious API</returns>
-        JObject FetchJSONSync(string urlPath, string type = "videos", string[]? fields = null, string? server = null);
+        JToken FetchJSONSync(string urlPath, string type = "videos", string[]? fields = null, string? server = null);
+        /// <summary>
+        /// Fetches a video object from the invidious API
+        /// </summary>
+        /// <param name="id">the id of the youtube video</param>
+        /// <param name="fields">the fields to pull back</param>
+        /// <returns>the video object</returns>
+        Task<InvidiousVideo> FetchVideoById(string id, string[]? fields = null);
+        /// <summary>
+        /// Fetches a video object from the invidious API
+        /// </summary>
+        /// <param name="id">the id of the youtube video</param>
+        /// <param name="fields">the fields to pull back</param>
+        /// <returns>the video object</returns>
+        InvidiousVideo FetchVideoByIdSync(string id, string[]? fields = null);
+        /// <summary>
+        /// Fetches all video objects authored by the channel with the id given from the invidious API
+        /// </summary>
+        /// <param name="channelId">the id of the youtube channel</param>
+        /// <returns>a list of videos authored by the channel</returns>
+        Task<List<InvidiousChannelVideo>> FetchVideosByChannelId(string channelId);
+        /// <summary>
+        /// Fetches all video objects authored by the channel with the id given from the invidious API
+        /// </summary>
+        /// <param name="channelId">the id of the youtube channel</param>
+        /// <returns>a list of videos authored by the channel</returns>
+        List<InvidiousChannelVideo> FetchVideosByChannelIdSync(string channelId);
+        /// <summary>
+        /// Fetches a channel object from the invidious API
+        /// </summary>
+        /// <param name="id">the id of the youtube channel</param>
+        /// <param name="fields">the fields to pull back</param>
+        /// <returns></returns>
+        Task<InvidiousChannel> FetchChannelById(string id, string[]? fields = null);
+        /// <summary>
+        /// Fetches a channel object from the invidious API
+        /// </summary>
+        /// <param name="id">the id of the youtube channel</param>
+        /// <param name="fields">the fields to pull back</param>
+        /// <returns></returns>
+        InvidiousChannel FetchChannelByIdSync(string id, string[]? fields = null);
+        /// <summary>
+        /// Fetches a playlist object from the invidious API
+        /// </summary>
+        /// <param name="id">the id of the youtube playlist</param>
+        /// <param name="fields">the fields to pull back</param>
+        /// <returns>the playlist object associated with the given id</returns>
+        Task<InvidiousPlaylist> FetchPlaylistById(string id, string[]? fields = null);
+        /// <summary>
+        /// Fetches a playlist object from the invidious API
+        /// </summary>
+        /// <param name="id">the id of the youtube playlist</param>
+        /// <param name="fields">the fields to pull back</param>
+        /// <returns>the playlist object associated with the given id</returns>
+        InvidiousPlaylist FetchPlaylistByIdSync(string id, string[]? fields = null);
         /// <summary>
         /// Fetches the video formats available for the given videoId by their itag
         /// </summary>
