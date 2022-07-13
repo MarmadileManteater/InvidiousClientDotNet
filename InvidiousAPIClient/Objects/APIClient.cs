@@ -314,10 +314,11 @@ namespace InvidiousAPIClient.Objects
             {
                 // add the apdative formats to the format streams
                 formatStreams = formatStreams.ArrayJoin(adaptiveFormats);
-                foreach (JObject streamObject in formatStreams)
+                foreach (JObject jObject in formatStreams)
                 {
-                    string? itag = streamObject["itag"]?.Value<string>();
-                    if (itag != null)
+                    FormatStream streamObject = new(jObject);
+                    string itag = streamObject.Itag;
+                    if (itag != "")
                     {
                         itags.Add(itag);
                     }
