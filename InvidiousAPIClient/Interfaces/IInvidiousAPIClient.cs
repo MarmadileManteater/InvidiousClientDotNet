@@ -16,13 +16,13 @@ namespace MarmadileManteater.InvidiousClient.Interfaces
         /// </summary>
         /// <param name="condition">(optional) if given will check each instance returned from the official list and add instances to the response based on the response of the condition</param>
         /// <returns>a list of instances which support API and the given condition</returns>
-        Task<List<string>> GetInvidiousAPIs(Func<InvidiousInstance, bool>? condition = null);
+        Task<IList<string>> GetInvidiousAPIs(Func<InvidiousInstance, bool>? condition = null);
         /// <summary>
         /// Gets a list of invidious instances which support API functionality
         /// </summary>
         /// <param name="condition">(optional) if given will check each instance returned from the official list and add instances to the response based on the response of the condition</param>
         /// <returns>a list of instances which support API and the given condition</returns>
-        List<string> GetInvidiousAPIsSync(Func<InvidiousInstance, bool>? condition = null);
+        IList<string> GetInvidiousAPIsSync(Func<InvidiousInstance, bool>? condition = null);
         /// <summary>
         /// Fetches a JSON response from the Invidious API
         /// </summary>
@@ -60,13 +60,13 @@ namespace MarmadileManteater.InvidiousClient.Interfaces
         /// </summary>
         /// <param name="channelId">the id of the youtube channel</param>
         /// <returns>a list of videos authored by the channel</returns>
-        Task<List<InvidiousChannelVideo>> FetchVideosByChannelId(string channelId);
+        Task<IList<InvidiousChannelVideo>> FetchVideosByChannelId(string channelId);
         /// <summary>
         /// Fetches all video objects authored by the channel with the id given from the invidious API
         /// </summary>
         /// <param name="channelId">the id of the youtube channel</param>
         /// <returns>a list of videos authored by the channel</returns>
-        List<InvidiousChannelVideo> FetchVideosByChannelIdSync(string channelId);
+        IList<InvidiousChannelVideo> FetchVideosByChannelIdSync(string channelId);
         /// <summary>
         /// Fetches a channel object from the invidious API
         /// </summary>
@@ -100,13 +100,13 @@ namespace MarmadileManteater.InvidiousClient.Interfaces
         /// </summary>
         /// <param name="videoId">the id of the youtube video</param>
         /// <returns>a list of itags for the formats available for this video</returns>
-        Task<List<string>> FetchVideoFormatTags(string videoId);
+        Task<IList<string>> FetchVideoFormatTags(string videoId);
         /// <summary>
         /// Fetches the video formats available for the given videoId by their itag
         /// </summary>
         /// <param name="videoId">the id of the youtube video</param>
         /// <returns>a list of itags for the formats available for this video</returns>
-        List<string> FetchVideoFormatTagsSync(string videoId);
+        IList<string> FetchVideoFormatTagsSync(string videoId);
         /// <summary>
         /// Downloads a video stream by its' videoId and formatTag
         /// </summary>
@@ -168,7 +168,7 @@ namespace MarmadileManteater.InvidiousClient.Interfaces
         /// <param name="features"></param>
         /// <param name="region"></param>
         /// <returns></returns>
-        Task<List<JObject>> Search(string query, int page = 0, SortBy? sortBy = null, DateRange? date = null, Duration? duration = null, SearchType? searchType = null, Feature[]? features = null, string? region = null);
+        Task<IList<JObject>> Search(string query, int page = 0, SortBy? sortBy = null, DateRange? date = null, Duration? duration = null, SearchType? searchType = null, Feature[]? features = null, string? region = null);
         /// <summary>
         /// Returns a list of search results JObjects
         /// </summary>
@@ -181,6 +181,6 @@ namespace MarmadileManteater.InvidiousClient.Interfaces
         /// <param name="features"></param>
         /// <param name="region"></param>
         /// <returns></returns>
-        List<JObject> SearchSync(string query, int page = 0, SortBy? sortBy = null, DateRange? date = null, Duration? duration = null, SearchType? searchType = null, Feature[]? features = null, string? region = null);
+        IList<JObject> SearchSync(string query, int page = 0, SortBy? sortBy = null, DateRange? date = null, Duration? duration = null, SearchType? searchType = null, Feature[]? features = null, string? region = null);
     }
 }

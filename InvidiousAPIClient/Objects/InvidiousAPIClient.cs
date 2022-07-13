@@ -330,7 +330,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
             return task.Result;
         }
 
-        public async Task<List<string>> FetchVideoFormatTags(string videoId)
+        public async Task<IList<string>> FetchVideoFormatTags(string videoId)
         {
             List<string> itags = new();
             InvidiousVideo videoObject = await FetchVideoById(videoId, new string[] { "formatStreams", "adaptiveFormats" });
@@ -345,14 +345,14 @@ namespace MarmadileManteater.InvidiousClient.Objects
             return itags;
         }
 
-        public List<string> FetchVideoFormatTagsSync(string videoId)
+        public IList<string> FetchVideoFormatTagsSync(string videoId)
         {
-            Task<List<string>> task = FetchVideoFormatTags(videoId);
+            Task<IList<string>> task = FetchVideoFormatTags(videoId);
             task.Wait();
             return task.Result;
         }
 
-        public async Task<List<string>> GetInvidiousAPIs(Func<InvidiousInstance, bool>? condition = null)
+        public async Task<IList<string>> GetInvidiousAPIs(Func<InvidiousInstance, bool>? condition = null)
         {
             List<string> response = new();
             HttpResponseMessage instancesResponse = await Fetch("https://api.invidious.io/instances.json?pretty=1&sort_by=type,users");
@@ -394,9 +394,9 @@ namespace MarmadileManteater.InvidiousClient.Objects
             return response;
         }
 
-        public List<string> GetInvidiousAPIsSync(Func<InvidiousInstance, bool>? condition = null)
+        public IList<string> GetInvidiousAPIsSync(Func<InvidiousInstance, bool>? condition = null)
         {
-            Task<List<string>> task = GetInvidiousAPIs(condition);
+            Task<IList<string>> task = GetInvidiousAPIs(condition);
             task.Wait();
             return task.Result;
         }
@@ -427,7 +427,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
             return task.Result;
         }
 
-        public async Task<List<InvidiousChannelVideo>> FetchVideosByChannelId(string channelId)
+        public async Task<IList<InvidiousChannelVideo>> FetchVideosByChannelId(string channelId)
         {
             List<InvidiousChannelVideo> result = new();
             JArray? channelList = (await FetchJSON(channelId + "/videos", "channels")).Value<JArray>();
@@ -441,9 +441,9 @@ namespace MarmadileManteater.InvidiousClient.Objects
             return result;
         }
 
-        public List<InvidiousChannelVideo> FetchVideosByChannelIdSync(string channelId)
+        public IList<InvidiousChannelVideo> FetchVideosByChannelIdSync(string channelId)
         {
-            Task<List<InvidiousChannelVideo>> task = FetchVideosByChannelId(channelId);
+            Task<IList<InvidiousChannelVideo>> task = FetchVideosByChannelId(channelId);
             task.Wait();
             return task.Result;
         }
@@ -461,7 +461,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
             return task.Result;
         }
 
-        public async Task<List<JObject>> Search(string query, int page = 0, SortBy? sortBy = null, DateRange? date = null, Duration? duration = null, SearchType? searchType = null, Feature[]? features = null, string? region = null)
+        public async Task<IList<JObject>> Search(string query, int page = 0, SortBy? sortBy = null, DateRange? date = null, Duration? duration = null, SearchType? searchType = null, Feature[]? features = null, string? region = null)
         {
             List<JObject> result = new();
             string queryInterjection = "";
@@ -595,9 +595,9 @@ namespace MarmadileManteater.InvidiousClient.Objects
             }
             return result;
         }
-        public List<JObject> SearchSync(string query, int page = 0, SortBy? sortBy = null, DateRange? date = null, Duration? duration = null, SearchType? searchType = null, Feature[]? features = null, string? region = null)
+        public IList<JObject> SearchSync(string query, int page = 0, SortBy? sortBy = null, DateRange? date = null, Duration? duration = null, SearchType? searchType = null, Feature[]? features = null, string? region = null)
         {
-            Task<List<JObject>> task = Search(query, page, sortBy, date, duration, searchType, features);
+            Task<IList<JObject>> task = Search(query, page, sortBy, date, duration, searchType, features);
             task.Wait();
             return task.Result;
         }
