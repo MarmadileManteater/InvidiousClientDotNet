@@ -18,6 +18,9 @@ namespace InvidiousAPIClient.Objects.Data
             }
             _data = instanceObject;
         }
+        /// <summary>
+        /// Unicode representation of the country flag
+        /// </summary>
         public virtual string Flag
         {
             get
@@ -42,7 +45,9 @@ namespace InvidiousAPIClient.Objects.Data
                 return "";
             }
         }
-
+        /// <summary>
+        /// Does this instance support Cross Origin Resource Sharing (CORS)?
+        /// </summary>
         public virtual bool IsCorsEnabled
         {
             get
@@ -58,6 +63,9 @@ namespace InvidiousAPIClient.Objects.Data
             }
         }
 
+        /// <summary>
+        /// Does this instance support API requests?
+        /// </summary>
         public virtual bool IsApiEnabled
         {
             get
@@ -72,7 +80,9 @@ namespace InvidiousAPIClient.Objects.Data
                 }
             }
         }
-
+        /// <summary>
+        /// Mimetype and encoding
+        /// </summary>
         public virtual string Type
         {
             get
@@ -85,7 +95,9 @@ namespace InvidiousAPIClient.Objects.Data
                 return "";
             }
         }
-
+        /// <summary>
+        /// Uri for the instance
+        /// </summary>
         public virtual string Uri
         {
             get
@@ -98,7 +110,6 @@ namespace InvidiousAPIClient.Objects.Data
                 return "";
             }
         }
-
         public virtual InvidiousInstanceStats Stats
         {
             get

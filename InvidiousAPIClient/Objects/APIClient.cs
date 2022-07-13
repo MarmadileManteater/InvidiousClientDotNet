@@ -19,6 +19,11 @@ namespace InvidiousAPIClient.Objects
         private int failedAttempts = 0;
         public readonly bool CacheEnabled;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cacheEnabled">whether or not to cache responses from the invidious API will hit up the same url over an over again</param>
+        /// <param name="logger"></param>
         public APIClient(bool cacheEnabled, ILogger logger)
         {
             _httpResponseCache = new Dictionary<string, HttpResponseMessage>();
