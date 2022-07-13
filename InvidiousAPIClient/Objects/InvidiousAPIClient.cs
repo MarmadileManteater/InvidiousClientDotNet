@@ -26,24 +26,28 @@ namespace MarmadileManteater.InvidiousClient.Objects
         /// </summary>
         /// <param name="cacheEnabled">whether or not to cache responses from the invidious API will hit up the same url over an over again</param>
         /// <param name="logger"></param>
-        public InvidiousAPIClient(bool cacheEnabled, ILogger logger)
+        /// <param name="failureTolerance"></param>
+        public InvidiousAPIClient(bool cacheEnabled, ILogger logger, int failureTolerance = 5)
         {
             _httpResponseCache = new Dictionary<string, HttpResponseMessage>();
             CacheEnabled = cacheEnabled;
             _logger = logger;
             _chunkSize = 8192;
+            _failureTolerance = failureTolerance;
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="cacheEnabled">whether or not to cache responses from the invidious API will hit up the same url over an over again</param>
-        public InvidiousAPIClient(bool cacheEnabled = true)
+        /// <param name="failureTolerance"></param>
+        public InvidiousAPIClient(bool cacheEnabled = true, int failureTolerance = 5)
         {
             _httpResponseCache = new Dictionary<string, HttpResponseMessage>();
             CacheEnabled = cacheEnabled;
             _logger = new ConsoleLogger();
             _chunkSize = 8192;
+            _failureTolerance = failureTolerance;
         }
 
         protected async Task<HttpResponseMessage> Fetch(string url, HttpClient? client = null)
