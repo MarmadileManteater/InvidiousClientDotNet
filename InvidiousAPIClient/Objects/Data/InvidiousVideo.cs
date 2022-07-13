@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace InvidiousAPIClient.Objects.Data
+namespace MarmadileManteater.InvidiousClient.Objects.Data
 {
     public class InvidiousVideo
     {

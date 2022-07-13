@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
-namespace InvidiousAPIClient.Extensions
+namespace MarmadileManteater.InvidiousClient.Extensions
 {
     public static class JArrayExtensions
     {

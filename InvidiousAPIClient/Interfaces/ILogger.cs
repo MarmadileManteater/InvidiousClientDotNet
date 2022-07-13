@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using InvidiousAPIClient.Enums;
+using MarmadileManteater.InvidiousClient.Enums;
 
-namespace InvidiousAPIClient.Interfaces
+namespace MarmadileManteater.InvidiousClient.Interfaces
 {
     public interface ILogger
     {

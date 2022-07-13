@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using InvidiousAPIClient.Objects.Data;
+using MarmadileManteater.InvidiousClient.Objects.Data;
 using Newtonsoft.Json.Linq;
 
-namespace InvidiousAPIClient.Interfaces
+namespace MarmadileManteater.InvidiousClient.Interfaces
 {
     public interface IInvidiousAPIClient
     {

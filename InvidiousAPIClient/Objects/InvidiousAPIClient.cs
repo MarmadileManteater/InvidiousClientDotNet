@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using InvidiousAPIClient.Extensions;
-using InvidiousAPIClient.Interfaces;
-using InvidiousAPIClient.Objects.Data;
+using MarmadileManteater.InvidiousClient.Extensions;
+using MarmadileManteater.InvidiousClient.Interfaces;
+using MarmadileManteater.InvidiousClient.Objects.Data;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace InvidiousAPIClient.Objects
+namespace MarmadileManteater.InvidiousClient.Objects
 {
-    public class APIClient : IInvidiousAPIClient
+    public class InvidiousAPIClient : IInvidiousAPIClient
     {
         private readonly Dictionary<string, HttpResponseMessage> _httpResponseCache;
         private readonly int _chunkSize;
@@ -24,7 +24,7 @@ namespace InvidiousAPIClient.Objects
         /// </summary>
         /// <param name="cacheEnabled">whether or not to cache responses from the invidious API will hit up the same url over an over again</param>
         /// <param name="logger"></param>
-        public APIClient(bool cacheEnabled, ILogger logger)
+        public InvidiousAPIClient(bool cacheEnabled, ILogger logger)
         {
             _httpResponseCache = new Dictionary<string, HttpResponseMessage>();
             CacheEnabled = cacheEnabled;
@@ -36,7 +36,7 @@ namespace InvidiousAPIClient.Objects
         /// 
         /// </summary>
         /// <param name="cacheEnabled">whether or not to cache responses from the invidious API will hit up the same url over an over again</param>
-        public APIClient(bool cacheEnabled = true)
+        public InvidiousAPIClient(bool cacheEnabled = true)
         {
             _httpResponseCache = new Dictionary<string, HttpResponseMessage>();
             CacheEnabled = cacheEnabled;
@@ -93,9 +93,11 @@ namespace InvidiousAPIClient.Objects
             } 
             catch (Exception error)
             {
-                message = new HttpResponseMessage();
-                message.StatusCode = (System.Net.HttpStatusCode) 500;
-                message.Content = new StringContent(error.Message);
+                message = new HttpResponseMessage
+                {
+                    StatusCode = (System.Net.HttpStatusCode)500,
+                    Content = new StringContent(error.Message)
+                };
             }
 
             await _logger.Trace("Received response from: " + url + requestUrl);
@@ -151,42 +153,44 @@ namespace InvidiousAPIClient.Objects
 
                         // this section is adapted from code from this github post:
                         // https://github.com/dotnet/runtime/issues/16681#issuecomment-195980023
-                        using (Stream contentStream = await response.Content.ReadAsStreamAsync(), 
-                                        fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None, _chunkSize, true))
+                        using Stream contentStream = await response.Content.ReadAsStreamAsync(),
+                                        fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None, _chunkSize, true);
+                        long? contentLength = 0;
+                        if (response.Content?.Headers?.ContentLength.HasValue == true)
                         {
-                            long? contentLength = response.Content?.Headers?.ContentLength.Value;
-                            var totalRead = 0L;
-                            var totalReads = 0L;
-                            var buffer = new byte[_chunkSize];
-                            var isMoreToRead = true;
-                            await _logger.LogInfo("Downloading stream with itag of \"" + stream.Itag + "\" to the file:\r\n" + fileName);
-                            IProgress<double> progress = _logger.GetProgressInterface();
-                            do
+                            contentLength = response.Content.Headers?.ContentLength.Value;
+                        }
+                        var totalRead = 0L;
+                        var totalReads = 0L;
+                        var buffer = new byte[_chunkSize];
+                        var isMoreToRead = true;
+                        await _logger.LogInfo("Downloading stream with itag of \"" + stream.Itag + "\" to the file:\r\n" + fileName);
+                        IProgress<double> progress = _logger.GetProgressInterface();
+                        do
+                        {
+                            var read = await contentStream.ReadAsync(buffer, 0, buffer.Length);
+                            if (read == 0)
                             {
-                                var read = await contentStream.ReadAsync(buffer, 0, buffer.Length);
-                                if (read == 0)
-                                {
-                                    isMoreToRead = false;
-                                }
-                                else
-                                {
-                                    await fileStream.WriteAsync(buffer, 0, read);
+                                isMoreToRead = false;
+                            }
+                            else
+                            {
+                                await fileStream.WriteAsync(buffer, 0, read);
 
-                                    totalRead += read;
-                                    totalReads += 1;
-                                    if (contentLength != null)
+                                totalRead += read;
+                                totalReads += 1;
+                                if (contentLength != null)
+                                {
+                                    double? progressReport = ((double)totalRead) / contentLength;
+                                    if (progressReport != null)
                                     {
-                                        double? progressReport = ((double) totalRead) / contentLength;
-                                        if (progressReport != null)
-                                        {
-                                            progress.Report(progressReport.Value);
-                                        }
+                                        progress.Report(progressReport.Value);
                                     }
                                 }
+                            }
 
-                            } while (isMoreToRead);
-                            await _logger.Trace("Finished downloading!");
-                        }
+                        } while (isMoreToRead);
+                        await _logger.Trace("Finished downloading!");
                     }
                 }
             }

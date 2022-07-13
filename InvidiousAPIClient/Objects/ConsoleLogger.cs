@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using InvidiousAPIClient.Enums;
-using InvidiousAPIClient.Interfaces;
+using MarmadileManteater.InvidiousClient.Enums;
+using MarmadileManteater.InvidiousClient.Interfaces;
 
-namespace InvidiousAPIClient.Objects
+namespace MarmadileManteater.InvidiousClient.Objects
 {
     public class ConsoleLogger : ILogger
     {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
-namespace InvidiousAPIClient.Objects.Data
+namespace MarmadileManteater.InvidiousClient.Objects.Data
 {
     public class InvidiousInstance
     {

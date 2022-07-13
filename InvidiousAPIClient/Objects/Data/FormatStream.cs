@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using InvidiousAPIClient.Extensions;
+using MarmadileManteater.InvidiousClient.Extensions;
 using Newtonsoft.Json.Linq;
 
-namespace InvidiousAPIClient.Objects.Data
+namespace MarmadileManteater.InvidiousClient.Objects.Data
 {
     public class FormatStream
     {
