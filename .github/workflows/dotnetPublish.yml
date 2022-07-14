@@ -25,6 +25,12 @@ jobs:
         encoding: 'utf8'
         path: 'InvidiousAPIClient'
 
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore
+      
     # Publish
     - name: Package
       run: dotnet pack -c Release -o . InvidiousAPIClient/InvidiousClient.csproj
