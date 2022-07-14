@@ -21,7 +21,7 @@ jobs:
       uses: mingjun97/file-regex-replace@v1
       with:
         regex: '<Version>([0-9\.]*)</Version>'
-        replacement: '<Version>$1.${{ github.run_number }}.DEV</Version>'
+        replacement: '<Version>$1.0.${{ github.run_number }}</Version>'
         flags: "g"
         include: 'InvidiousClient.csproj'
         exclude: '.^'
