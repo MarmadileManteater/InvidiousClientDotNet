@@ -49,7 +49,9 @@ jobs:
     - name: Tag version commit
       uses: christophebedard/tag-version-commit@v1
       id: some-get-commit-action
-
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
     - name: Create release body
       run: |
         echo "Built from commit ${{ steps.some-get-commit-action.outputs.commit }}" >> release.txt
