@@ -48,9 +48,9 @@ jobs:
 
     - name: Create release body
       run: |
-        echo "${{ github.event.head_commit.message }}" > release.txt
-        echo "You can also view this release on the NuGet Gallery:" > release.txt
-        echo "https://www.nuget.org/packages/InvidiousClient/${{ steps.get_version.outputs.RELEASE_VERSION }}" > release.txt
+        echo "${{ github.event.head_commit.message }}" >> release.txt
+        echo "You can also view this release on the NuGet Gallery:" >>release.txt
+        echo "https://www.nuget.org/packages/InvidiousClient/${{ steps.get_version.outputs.RELEASE_VERSION }}" >> release.txt
 
     - name: Create draft release
       id: create_release
