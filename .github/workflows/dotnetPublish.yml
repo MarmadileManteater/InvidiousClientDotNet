@@ -73,7 +73,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: IInvidiousAPIClient/bin/Release/*.nupkg
+        asset_path: InvidiousAPIClient/bin/Release/InvidiousClient.${{ steps.get_version.outputs.RELEASE_VERSION }}.nupkg
         asset_name: InvidiousClient.${{ steps.get_version.outputs.RELEASE_VERSION }}.nupkg
         asset_content_type: application/nupkg
 
