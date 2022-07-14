@@ -16,9 +16,14 @@
     <AnalysisLevel>latest</AnalysisLevel>
     <Authors>MarmadileManteater</Authors>
     <Version>1.0</Version>
+    <PackageIcon>invidious.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\icons\invidious.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
