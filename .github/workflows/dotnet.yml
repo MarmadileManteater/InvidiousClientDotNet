@@ -17,6 +17,17 @@ jobs:
       with:
         dotnet-version: 6.0.x
 
+    - name: Modify nuget package number
+      uses: mingjun97/file-regex-replace
+      with:
+        regex: '<version>([0-9\.]*)</version>",'
+        replacement: '<version>$1.${{ github.run_number }}</version>'
+        flags: "g"
+        include: 'InvidiousClient.csproj'
+        exclude: '.^'
+        encoding: 'utf8'
+        path: 'InvidiousClient'
+
     - name: Restore dependencies
       run: dotnet restore
 

@@ -14,6 +14,8 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/MarmadileManteater/InvidiousClientDotNet.git</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
+    <Authors>MarmadileManteater</Authors>
+    <Version>0.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
