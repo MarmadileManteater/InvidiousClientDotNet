@@ -52,8 +52,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ steps.get_version.outputs.RELEASE_VERSION }}.${{ github.run_number }}
-        release_name: ${{ steps.get_version.outputs.RELEASE_VERSION }}.${{ github.run_number }}
+        tag_name: ${{ steps.get_version.outputs.RELEASE_VERSION }}
+        release_name: ${{ steps.get_version.outputs.RELEASE_VERSION }}
         draft: true
         prerelease: true
 
@@ -73,7 +73,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: IInvidiousAPIClient/bin/Release/InvidiousClient.${{ steps.get_version.outputs.RELEASE_VERSION }}.nupkg
+        asset_path: IInvidiousAPIClient/bin/Release/*.nupkg
         asset_name: InvidiousClient.${{ steps.get_version.outputs.RELEASE_VERSION }}.nupkg
         asset_content_type: application/nupkg
 
