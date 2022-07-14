@@ -26,7 +26,7 @@ jobs:
         include: 'InvidiousClient.csproj'
         exclude: '.^'
         encoding: 'utf8'
-        path: 'InvidiousClient'
+        path: 'InvidiousAPIClient'
 
     - name: Restore dependencies
       run: dotnet restore
