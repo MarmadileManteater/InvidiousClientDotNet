@@ -33,7 +33,7 @@ jobs:
 
     # Publish
     - name: Package
-      run: dotnet pack -c Release -o . InvidiousAPIClient/InvidiousClient.csproj
+      run: dotnet pack -c Release -o . InvidiousAPIClient/InvidiousClient.csproj /p:ContinuousIntegrationBuild=true
       
     - name: Publish
       run: dotnet nuget push *.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
