@@ -8,16 +8,7 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        runtime: [ linux-x64, windows-x64 ]
-        include:
-        - runtime: linux-x64
-          os: ubuntu-latest
-        - runtime: windows-x64
-          os: windows-latest
-
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -31,28 +22,17 @@ jobs:
       run: dotnet build --no-restore
       
     - name: Package for Nuget
-      if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.runtime, 'linux-x64')
       run: dotnet pack
 
-    - name: Upload the Linux build artifact
+    - name: Upload the build artifact
       uses: actions/upload-artifact@v2
-      if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.runtime, 'linux-x64')
       with:
         name: InvidiousClientDotNet-Linux-${{ github.run_number }}
         path: InvidiousAPIClient/bin/Debug/net6.0
         
     - name: Upload the Nuget Package
       uses: actions/upload-artifact@v2
-      if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.runtime, 'linux-x64')
       with:
         name: InvidiousClientDotNet-Nuget-${{ github.run_number }}
         path: InvidiousAPIClient/bin/Debug/*.nupkg
-        
-    - name: Upload the Windows build artifact
-      uses: actions/upload-artifact@v2
-      if: startsWith(matrix.os, 'windows') && startsWith(matrix.runtime, 'linux-x64')
-      with:
-        name: InvidiousClientDotNet-Windows-${{ github.run_number }}
-        path: InvidiousAPIClient\bin\Debug\net6.0
-        
         
