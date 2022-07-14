@@ -157,7 +157,7 @@ namespace MarmadileManteater.InvidiousClient.Interfaces
         /// <param name="condition">the condition by which to select the first matching video to download</param>
         void DownloadFirstMatchingVideoFormatSync(string videoId, string saveDirectory, Func<FormatStream, bool>? condition = null);
         /// <summary>
-        /// Returns a list of search results JObjects
+        /// Searches using the invidious API
         /// </summary>
         /// <param name="query">a search query</param>
         /// <param name="page"></param>
@@ -167,10 +167,10 @@ namespace MarmadileManteater.InvidiousClient.Interfaces
         /// <param name="searchType"></param>
         /// <param name="features"></param>
         /// <param name="region"></param>
-        /// <returns></returns>
+        /// <returns>search results</returns>
         Task<IList<JObject>> Search(string query, int page = 0, SortBy? sortBy = null, DateRange? date = null, Duration? duration = null, SearchType? searchType = null, Feature[]? features = null, string? region = null);
         /// <summary>
-        /// Returns a list of search results JObjects
+        /// Searches using the invidious API
         /// </summary>
         /// <param name="query">a search query</param>
         /// <param name="page"></param>
@@ -180,7 +180,7 @@ namespace MarmadileManteater.InvidiousClient.Interfaces
         /// <param name="searchType"></param>
         /// <param name="features"></param>
         /// <param name="region"></param>
-        /// <returns></returns>
+        /// <returns>search results</returns>
         IList<JObject> SearchSync(string query, int page = 0, SortBy? sortBy = null, DateRange? date = null, Duration? duration = null, SearchType? searchType = null, Feature[]? features = null, string? region = null);
     }
 }
