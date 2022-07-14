@@ -47,18 +47,18 @@ jobs:
         PROJ_FILE: InvidiousAPIClient/InvidiousClient.csproj
 
     - name: Create release body
-        run: |
-          BODY=$(cat << EOF
-            ${{ github.event.head_commit.message }}
+      run: |
+        BODY=$(cat << EOF
+          ${{ github.event.head_commit.message }}
 
-            You can also view this release on the NuGet Gallery:
-            https://www.nuget.org/packages/InvidiousClient/${{ steps.get_version.outputs.RELEASE_VERSION }}
+          You can also view this release on the NuGet Gallery:
+          https://www.nuget.org/packages/InvidiousClient/${{ steps.get_version.outputs.RELEASE_VERSION }}
 
-          EOF
-          )
-          echo "BODY<<EOF" >> $GITHUB_ENV
-          echo "$BODY" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+        EOF
+        )
+        echo "BODY<<EOF" >> $GITHUB_ENV
+        echo "$BODY" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
 
     - name: Create draft release
       id: create_release
