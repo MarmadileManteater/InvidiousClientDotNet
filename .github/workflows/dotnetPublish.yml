@@ -29,8 +29,8 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --no-restore
-      
+      run: dotnet build --configuration Release --no-restore
+
     # Publish
     - name: Package
       run: dotnet pack -c Release -o . InvidiousAPIClient/InvidiousClient.csproj
