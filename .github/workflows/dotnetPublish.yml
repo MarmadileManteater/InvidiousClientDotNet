@@ -54,7 +54,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: InvidiousAPIClient/bin/Debug/net6.0/InvidiousClient.dll
+        asset_path: InvidiousAPIClient/bin/Release/net6.0/InvidiousClient.dll
         asset_name: InvidiousClient.dll
         asset_content_type: application/dll
 
@@ -64,7 +64,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: IInvidiousAPIClient/bin/Debug/InvidiousClient.$1.${{ github.run_number }}.nupkg
+        asset_path: IInvidiousAPIClient/bin/Release/InvidiousClient.$1.${{ github.run_number }}.nupkg
         asset_name: InvidiousClient.$1.${{ github.run_number }}.nupkg
         asset_content_type: application/nupkg
 
