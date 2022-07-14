@@ -46,10 +46,14 @@ jobs:
         # 
         PROJ_FILE: InvidiousAPIClient/InvidiousClient.csproj
 
+    - uses: some/get-commit-action@v1
+      id: some-get-commit-action
+
     - name: Create release body
       run: |
-        echo "${{ github.event.head_commit.message }}" >> release.txt
-        echo "You can also view this release on the NuGet Gallery:" >>release.txt
+        echo "Built from commit ${{ steps.some-get-commit-action.outputs.commit }}" >> release.txt
+        echo "Latest Commit Message: ${{ github.event.head_commit.message }}" >> release.txt
+        echo "You can also view this release on the NuGet Gallery:" >> release.txt
         echo "https://www.nuget.org/packages/InvidiousClient/${{ steps.get_version.outputs.RELEASE_VERSION }}" >> release.txt
 
     - name: Create draft release
