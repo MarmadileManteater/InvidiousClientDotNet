@@ -1,0 +1,35 @@
+name: Publish
+
+on:
+  push:
+    branches: [ "release" ]
+jobs:
+  publish:
+    name: Publish Nuget package
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+        
+    - name: Modify nuget package number
+      uses: mingjun97/file-regex-replace@v1
+      with:
+        regex: '<Version>([0-9\.]*)</Version>'
+        replacement: '<Version>$1.${{ github.run_number }}</Version>'
+        flags: "g"
+        include: 'InvidiousClient.csproj'
+        exclude: '.^'
+        encoding: 'utf8'
+        path: 'InvidiousAPIClient'
+
+    # Publish
+    - name: Publish on version change
+      id: publish_nuget
+      uses: brandedoutcast/publish-nuget@v2
+      with:
+        PROJECT_FILE_PATH: InvidiousAPIClient/InvidiousClient.csproj
+        BUILD_CONFIGURATION: Release
+        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
