@@ -33,3 +33,41 @@ jobs:
         PROJECT_FILE_PATH: InvidiousAPIClient/InvidiousClient.csproj
         BUILD_CONFIGURATION: Release
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+
+    - name: Create draft release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: $1.${{ github.run_number }}
+        release_name: $1.${{ github.run_number }}
+        draft: true
+        prerelease: true
+
+    - name: Upload DLL artifact to release
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: InvidiousAPIClient/bin/Debug/net6.0/InvidiousClient.dll
+        asset_name: InvidiousClient.dll
+        asset_content_type: application/dll
+
+    - name: Upload Nuget artifact to release
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: IInvidiousAPIClient/bin/Debug/InvidiousClient.$1.${{ github.run_number }}.nupkg
+        asset_name: InvidiousClient.$1.${{ github.run_number }}.nupkg
+        asset_content_type: application/nupkg
+
+    - name: Create release in GitHub
+      uses: eregon/publish-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        release_id: ${{ steps.create_release.outputs.id }}
