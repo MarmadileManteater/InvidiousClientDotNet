@@ -46,7 +46,8 @@ jobs:
         # 
         PROJ_FILE: InvidiousAPIClient/InvidiousClient.csproj
 
-    - uses: some/get-commit-action@v1
+    - name: Tag version commit
+      uses: christophebedard/tag-version-commit@v1
       id: some-get-commit-action
 
     - name: Create release body
