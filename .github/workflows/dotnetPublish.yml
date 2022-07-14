@@ -28,7 +28,7 @@ jobs:
     # Publish
     - name: Publish on version change
       id: publish_nuget
-      uses: brandedoutcast/publish-nuget@v2
+      uses: brandedoutcast/publish-nuget@v2.5.5
       with:
         PROJECT_FILE_PATH: InvidiousAPIClient/InvidiousClient.csproj
         BUILD_CONFIGURATION: Release
