@@ -24,15 +24,15 @@ jobs:
     - name: Package for Nuget
       run: dotnet pack
 
-    - name: Upload the build artifact
+    - name: Upload the DLL artifact
       uses: actions/upload-artifact@v2
       with:
-        name: InvidiousClientDotNet-Linux-${{ github.run_number }}
+        name: InvidiousClientDotNet-${{ github.run_number }}-DLL
         path: InvidiousAPIClient/bin/Debug/net6.0
         
-    - name: Upload the Nuget Package
+    - name: Upload the Nuget artifact
       uses: actions/upload-artifact@v2
       with:
-        name: InvidiousClientDotNet-Nuget-${{ github.run_number }}
+        name: InvidiousClientDotNet-${{ github.run_number }}-NUGET
         path: InvidiousAPIClient/bin/Debug/*.nupkg
         
