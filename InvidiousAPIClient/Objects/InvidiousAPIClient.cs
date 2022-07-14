@@ -53,7 +53,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
         protected async Task<HttpResponseMessage> Fetch(string url, HttpClient? client = null)
         {
             string requestUrl = "";
-            string absolutePath = new Uri(url).AbsolutePath;
+            string absolutePath = new Uri(url).PathAndQuery;
             // If there is an entry in the cache for this url,
             // we don't need to check if cache is enabled because
             // the cache will always be empty if it is disabled.
