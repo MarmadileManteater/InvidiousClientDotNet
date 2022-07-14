@@ -22,7 +22,7 @@ jobs:
       run: dotnet build --no-restore
       
     - name: Package for Nuget
-      run: dotnet pack
+      run: dotnet pack --no-restore
 
     - name: Upload the DLL artifact
       uses: actions/upload-artifact@v2
