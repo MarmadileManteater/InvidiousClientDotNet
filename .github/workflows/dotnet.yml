@@ -16,23 +16,22 @@ jobs:
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: 6.0.x
+
     - name: Restore dependencies
       run: dotnet restore
+
     - name: Build
       run: dotnet build --no-restore
-      
-    - name: Package for Nuget
-      run: dotnet pack --no-restore
 
     - name: Upload the DLL artifact
       uses: actions/upload-artifact@v2
       with:
-        name: InvidiousClientDotNet-${{ github.run_number }}-DLL
+        name: InvidiousClientDotNet-development-${{ github.run_number }}-DLL
         path: InvidiousAPIClient/bin/Debug/net6.0
         
     - name: Upload the Nuget artifact
       uses: actions/upload-artifact@v2
       with:
-        name: InvidiousClientDotNet-${{ github.run_number }}-NUGET
+        name: InvidiousClientDotNet-development-${{ github.run_number }}-NUGET
         path: InvidiousAPIClient/bin/Debug/*.nupkg
         
