@@ -26,13 +26,10 @@ jobs:
         path: 'InvidiousAPIClient'
 
     # Publish
-    - name: Publish on version change
-      id: publish_nuget
-      uses: brandedoutcast/publish-nuget@v2.5.5
-      with:
-        PROJECT_FILE_PATH: InvidiousAPIClient/InvidiousClient.csproj
-        BUILD_CONFIGURATION: Release
-        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+    - name: Package
+      run: dotnet pack -c Release -o . InvidiousAPIClient/InvidiousClient.csproj
+    - name: Publish
+      run: dotnet nuget push *.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
 
     - name: Create draft release
       id: create_release
