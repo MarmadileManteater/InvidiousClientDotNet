@@ -306,9 +306,9 @@ namespace MarmadileManteater.InvidiousClient.Objects
             {
                 server = _defaultServer;
             }
-            IList<string> apis = await GetInvidiousAPIs();
-            if (server == null)
-            {
+            // if default server is null
+            if (server == null) {
+                IList<string> apis = await GetInvidiousAPIs();
                 Random random = new();
                 int randomIndex = random.Next(apis.Count);
                 server = apis[randomIndex];
@@ -357,8 +357,13 @@ namespace MarmadileManteater.InvidiousClient.Objects
                 catch (Exception exception)
                 {
                     await _logger.LogError("Failed to fetch from the invidious API", exception);
-                    server = apis[new Random().Next(apis.Count())];
+                    
                     failedAttempts++;
+                    if (failedAttempts < _failureTolerance)
+                    {// if failure attempts within error tolerance
+                        IList<string> apis = await GetInvidiousAPIs();// get a new server
+                        server = apis[new Random().Next(apis.Count())];
+                    }
                 }
             }
             // if is is still not a success code we have failed a certain number of consecutive times.
