@@ -12,7 +12,7 @@ An library which allows you to easily interface with the [Invidious](https://git
 
     IInvidiousAPIClient client = new InvidiousAPIClient();
     // Fetch what format tags are available for this video
-    IList<string> formatTags = client.FetchVideoFormatTagsSync(videoId)
+    IList<string> formatTags = client.FetchVideoFormatTagsSync(videoId);
     // Download the first available format for this video
     client.DownloadVideoByFormatTagSync(videoId, outputDirectory, formatTags.First());
 ```
