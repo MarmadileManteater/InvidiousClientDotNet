@@ -12,6 +12,10 @@ using Newtonsoft.Json.Linq;
 
 namespace MarmadileManteater.InvidiousClient.Objects
 {
+    /// <summary>
+    /// A client which can automatically find an available Invidious instance and use that instance to retrieve data stored from the Invidious API.
+    /// Optionally, you can give it a default server to connect to.
+    /// </summary>
     public class InvidiousAPIClient : IInvidiousAPIClient
     {
         private readonly Dictionary<string, HttpResponseMessage> _httpResponseCache;
@@ -19,37 +23,67 @@ namespace MarmadileManteater.InvidiousClient.Objects
         private readonly int _failureTolerance = 5;
         private readonly ILogger _logger;
         private int failedAttempts = 0;
+        private readonly string? _defaultServer;
+        /// <summary>
+        /// Is the cache enabled for this client?
+        /// </summary>
         public readonly bool CacheEnabled;
 
         /// <summary>
-        /// 
+        /// This client will start with the default server if given, but otherwise, and during failures within the fail tolerance, it will use a random server.
+        /// It can also have the output of the client redirected to a different type of ILogger.
         /// </summary>
         /// <param name="cacheEnabled">whether or not to cache responses from the invidious API will hit up the same url over an over again</param>
         /// <param name="logger"></param>
         /// <param name="failureTolerance"></param>
-        public InvidiousAPIClient(bool cacheEnabled, ILogger logger, int failureTolerance = 5)
+        /// <param name="defaultServer">if given will make requests out to this server first, and it will still fallback to a random instance if this instance fails</param>
+        public InvidiousAPIClient(bool cacheEnabled, ILogger logger, int failureTolerance = 5, string? defaultServer = null)
         {
             _httpResponseCache = new Dictionary<string, HttpResponseMessage>();
             CacheEnabled = cacheEnabled;
             _logger = logger;
             _chunkSize = 8192;
             _failureTolerance = failureTolerance;
+            _defaultServer = defaultServer;
         }
 
         /// <summary>
-        /// 
+        /// This client will only try to reach out to the given server and throw immediately when that server fails instead of retrying another server
+        /// </summary>
+        /// <param name="cacheEnabled">whether or not to cache responses from the invidious API will hit up the same url over an over again</param>
+        /// <param name="defaultServer"></param>
+        public InvidiousAPIClient(bool cacheEnabled = true, string? defaultServer = null)
+        {
+            _httpResponseCache = new Dictionary<string, HttpResponseMessage>();
+            CacheEnabled = cacheEnabled;
+            _logger = new ConsoleLogger();
+            _chunkSize = 8192;
+            _failureTolerance = 0;
+            _defaultServer = defaultServer;
+        }
+
+        /// <summary>
+        /// This client will start with the default server if given, but otherwise, and during failures within the fail tolerance, it will use a random server
         /// </summary>
         /// <param name="cacheEnabled">whether or not to cache responses from the invidious API will hit up the same url over an over again</param>
         /// <param name="failureTolerance"></param>
-        public InvidiousAPIClient(bool cacheEnabled = true, int failureTolerance = 5)
+        /// <param name="defaultServer"></param>
+        public InvidiousAPIClient(bool cacheEnabled = true, int failureTolerance = 5, string? defaultServer = null)
         {
             _httpResponseCache = new Dictionary<string, HttpResponseMessage>();
             CacheEnabled = cacheEnabled;
             _logger = new ConsoleLogger();
             _chunkSize = 8192;
             _failureTolerance = failureTolerance;
+            _defaultServer = defaultServer;
         }
 
+        /// <summary>
+        /// This fetches a HTTP response message for the given URL. It caches when CacheEnabled is true.
+        /// </summary>
+        /// <param name="url">the url to the content</param>
+        /// <param name="client">an optional override for the HTTP client used</param>
+        /// <returns>the HttpResponseMessage returned from the URL</returns>
         protected async Task<HttpResponseMessage> Fetch(string url, HttpClient? client = null)
         {
             string requestUrl = "";
@@ -124,7 +158,8 @@ namespace MarmadileManteater.InvidiousClient.Objects
 
             return message;
         }
-
+        /// <inheritdoc/>
+        /// <exception cref="Exception">Throws if the amount of consecutive failures in a request is greater than the failure tolerance of the client</exception>
         public async Task DownloadAllMatchingVideoFormats(string videoId, string saveDirectory, Func<FormatStream, bool>? condition = null)
         {
             InvidiousVideo video = await FetchVideoById(videoId, new string[] { "formatStreams", "adaptiveFormats" });
@@ -216,6 +251,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
             }
         }
 
+        /// <inheritdoc />
         public void DownloadAllMatchingVideoFormatsSync(string videoId, string saveDirectory, Func<FormatStream, bool>? condition = null)
         {
             Task task = DownloadAllMatchingVideoFormats(videoId, saveDirectory, condition);
@@ -223,6 +259,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
             return;
         }
 
+        /// <inheritdoc />
         public async Task DownloadFirstMatchingVideoFormat(string videoId, string saveDirectory, Func<FormatStream, bool>? condition = null)
         {
             bool hasMatched = false;
@@ -237,6 +274,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
             });
         }
 
+        /// <inheritdoc />
         public void DownloadFirstMatchingVideoFormatSync(string videoId, string saveDirectory, Func<FormatStream, bool>? condition = null)
         {
             Task task = DownloadFirstMatchingVideoFormat(videoId, saveDirectory, condition);
@@ -244,6 +282,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
             return;
         }
 
+        /// <inheritdoc />
         public async Task DownloadVideoByFormatTag(string videoId, string saveDirectory, string formatTag)
         {
             await DownloadFirstMatchingVideoFormat(videoId, saveDirectory, (FormatStream stream) =>
@@ -252,6 +291,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
             });
         }
 
+        /// <inheritdoc />
         public void DownloadVideoByFormatTagSync(string videoId, string saveDirectory, string formatTag)
         {
             Task task = DownloadVideoByFormatTag(videoId, saveDirectory, formatTag);
@@ -259,8 +299,13 @@ namespace MarmadileManteater.InvidiousClient.Objects
             return;
         }
 
+        /// <inheritdoc />
         public async Task<JToken> FetchJSON(string urlPath, string type = "videos", string[]? fields = null, string? server = null)
         {
+            if (server == null)
+            {
+                server = _defaultServer;
+            }
             IList<string> apis = await GetInvidiousAPIs();
             if (server == null)
             {
@@ -326,14 +371,14 @@ namespace MarmadileManteater.InvidiousClient.Objects
             }
             return result;
         }
-
+        /// <inheritdoc />
         public JToken FetchJSONSync(string urlPath, string type = "videos", string[]? fields = null, string? server = null)
         {
             Task<JToken> task = FetchJSON(urlPath, type, fields, server);
             task.Wait();
             return task.Result;
         }
-
+        /// <inheritdoc />
         public async Task<IList<string>> FetchVideoFormatTags(string videoId)
         {
             List<string> itags = new();
@@ -348,14 +393,14 @@ namespace MarmadileManteater.InvidiousClient.Objects
             }
             return itags;
         }
-
+        /// <inheritdoc />
         public IList<string> FetchVideoFormatTagsSync(string videoId)
         {
             Task<IList<string>> task = FetchVideoFormatTags(videoId);
             task.Wait();
             return task.Result;
         }
-
+        /// <inheritdoc />
         public async Task<IList<string>> GetInvidiousAPIs(Func<InvidiousInstance, bool>? condition = null)
         {
             List<string> response = new();
@@ -397,40 +442,40 @@ namespace MarmadileManteater.InvidiousClient.Objects
             }
             return response;
         }
-
+        /// <inheritdoc />
         public IList<string> GetInvidiousAPIsSync(Func<InvidiousInstance, bool>? condition = null)
         {
             Task<IList<string>> task = GetInvidiousAPIs(condition);
             task.Wait();
             return task.Result;
         }
-
+        /// <inheritdoc />
         public async Task<InvidiousVideo> FetchVideoById(string id, string[]? fields = null)
         {
             JObject? videoObject = (await FetchJSON(id, "videos", fields))?.Value<JObject>();
             return new InvidiousVideo(videoObject);
         }
-
+        /// <inheritdoc />
         public InvidiousVideo FetchVideoByIdSync(string id, string[]? fields = null)
         {
             Task<InvidiousVideo> task = FetchVideoById(id, fields);
             task.Wait();
             return task.Result;
         }
-
+        /// <inheritdoc />
         public async Task<InvidiousChannel> FetchChannelById(string id, string[]? fields = null)
         {
             JObject? channelObject = (await FetchJSON(id, "channels", fields))?.Value<JObject>();
             return new InvidiousChannel(channelObject);
         }
-
+        /// <inheritdoc />
         public InvidiousChannel FetchChannelByIdSync(string id, string[]? fields = null)
         {
             Task<InvidiousChannel> task = FetchChannelById(id, fields);
             task.Wait();
             return task.Result;
         }
-
+        /// <inheritdoc />
         public async Task<IList<InvidiousChannelVideo>> FetchVideosByChannelId(string channelId)
         {
             List<InvidiousChannelVideo> result = new();
@@ -444,27 +489,27 @@ namespace MarmadileManteater.InvidiousClient.Objects
             }
             return result;
         }
-
+        /// <inheritdoc />
         public IList<InvidiousChannelVideo> FetchVideosByChannelIdSync(string channelId)
         {
             Task<IList<InvidiousChannelVideo>> task = FetchVideosByChannelId(channelId);
             task.Wait();
             return task.Result;
         }
-
+        /// <inheritdoc />
         public async Task<InvidiousPlaylist> FetchPlaylistById(string id, string[]? fields = null)
         {
             JObject? playlistObject = (await FetchJSON(id, "playlists", fields))?.Value<JObject>();
             return new InvidiousPlaylist(playlistObject);
         }
-
+        /// <inheritdoc />
         public InvidiousPlaylist FetchPlaylistByIdSync(string id, string[]? fields = null)
         {
             Task<InvidiousPlaylist> task = FetchPlaylistById(id, fields);
             task.Wait();
             return task.Result;
         }
-
+        /// <inheritdoc />
         public async Task<IList<JObject>> Search(string query, int page = 0, SortBy? sortBy = null, DateRange? date = null, Duration? duration = null, SearchType? searchType = null, Feature[]? features = null, string? region = null)
         {
             List<JObject> result = new();
@@ -599,6 +644,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
             }
             return result;
         }
+        /// <inheritdoc />
         public IList<JObject> SearchSync(string query, int page = 0, SortBy? sortBy = null, DateRange? date = null, Duration? duration = null, SearchType? searchType = null, Feature[]? features = null, string? region = null)
         {
             Task<IList<JObject>> task = Search(query, page, sortBy, date, duration, searchType, features);

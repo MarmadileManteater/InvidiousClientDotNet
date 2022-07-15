@@ -15,7 +15,7 @@
     <RepositoryUrl>https://github.com/MarmadileManteater/InvidiousClientDotNet.git</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
     <Authors>MarmadileManteater</Authors>
-    <Version>1.0</Version>
+    <Version>1.1</Version>
     <PackageIcon>invidious.png</PackageIcon>
     <!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
