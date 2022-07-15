@@ -52,7 +52,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
         /// </summary>
         /// <param name="cacheEnabled">whether or not to cache responses from the invidious API will hit up the same url over an over again</param>
         /// <param name="defaultServer"></param>
-        public InvidiousAPIClient(bool cacheEnabled = true, string? defaultServer = null)
+        public InvidiousAPIClient(bool cacheEnabled, string? defaultServer = null)
         {
             _httpResponseCache = new Dictionary<string, HttpResponseMessage>();
             CacheEnabled = cacheEnabled;
