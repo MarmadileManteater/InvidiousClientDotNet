@@ -54,7 +54,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
         /// <param name="cacheEnabled">whether or not to cache responses from the invidious API will hit up the same url over an over again</param>
         /// /// <param name="logger"></param>
         /// <param name="defaultServer"></param>
-        public InvidiousAPIClient(bool cacheEnabled, ILogger logger, string? defaultServer = null)
+        public InvidiousAPIClient(bool cacheEnabled, ILogger logger, string defaultServer)
         {
             _httpResponseCache = new Dictionary<string, HttpResponseMessage>();
             CacheEnabled = cacheEnabled;
@@ -69,7 +69,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
         /// </summary>
         /// <param name="cacheEnabled">whether or not to cache responses from the invidious API will hit up the same url over an over again</param>
         /// <param name="defaultServer"></param>
-        public InvidiousAPIClient(bool cacheEnabled, string? defaultServer = null)
+        public InvidiousAPIClient(bool cacheEnabled, string defaultServer)
         {
             _httpResponseCache = new Dictionary<string, HttpResponseMessage>();
             CacheEnabled = cacheEnabled;
