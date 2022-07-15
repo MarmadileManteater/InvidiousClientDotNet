@@ -48,6 +48,23 @@ namespace MarmadileManteater.InvidiousClient.Objects
         }
 
         /// <summary>
+        /// This client will only try to reach out to the given server and throw immediately when that server fails instead of retrying another server.
+        /// It also has an overridable ILogger for redirecting logs to something or somewhere.
+        /// </summary>
+        /// <param name="cacheEnabled">whether or not to cache responses from the invidious API will hit up the same url over an over again</param>
+        /// /// <param name="logger"></param>
+        /// <param name="defaultServer"></param>
+        public InvidiousAPIClient(bool cacheEnabled, ILogger logger, string? defaultServer = null)
+        {
+            _httpResponseCache = new Dictionary<string, HttpResponseMessage>();
+            CacheEnabled = cacheEnabled;
+            _logger = logger;
+            _chunkSize = 8192;
+            _failureTolerance = 0;
+            _defaultServer = defaultServer;
+        }
+
+        /// <summary>
         /// This client will only try to reach out to the given server and throw immediately when that server fails instead of retrying another server
         /// </summary>
         /// <param name="cacheEnabled">whether or not to cache responses from the invidious API will hit up the same url over an over again</param>
