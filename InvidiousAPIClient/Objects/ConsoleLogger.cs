@@ -12,6 +12,8 @@ namespace MarmadileManteater.InvidiousClient.Objects
     {
         public Task Log(string message, LogLevel level, Exception? exception)
         {
+            ConsoleColor previousBackground = Console.BackgroundColor;
+            ConsoleColor previousForeground = Console.ForegroundColor;
             switch (level)
             {
                 case LogLevel.Error:
@@ -23,11 +25,9 @@ namespace MarmadileManteater.InvidiousClient.Objects
                     Console.ForegroundColor = ConsoleColor.White;
                     break;
                 case LogLevel.Information:
-                    Console.BackgroundColor = ConsoleColor.Black;
                     Console.ForegroundColor = ConsoleColor.White;
                     break;
                 case LogLevel.Trace:
-                    Console.BackgroundColor = ConsoleColor.Black;
                     Console.ForegroundColor = ConsoleColor.Gray;
                     break;
             }
@@ -36,8 +36,8 @@ namespace MarmadileManteater.InvidiousClient.Objects
             {
                 Console.WriteLine(exception);
             }
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = previousBackground;
+            Console.ForegroundColor = previousForeground;
             return Task.CompletedTask;
         }
 
