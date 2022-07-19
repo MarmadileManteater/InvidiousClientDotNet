@@ -169,7 +169,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
                     // This will never add duplicate entries. If the
                     // key already exists, this method would have
                     // returned in the first conditional.
-                    _httpResponseCache[absolutePath] new KeyValuePair<DateTime, HttpResponseMessage>(DateTime.Now, message);
+                    _httpResponseCache[absolutePath] = new KeyValuePair<DateTime, HttpResponseMessage>(DateTime.Now, message);
                     await _logger.Trace("Adding to the http response cache: " + url);
                 }
             }
