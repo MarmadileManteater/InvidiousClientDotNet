@@ -19,7 +19,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
     public class InvidiousAPIClient : IInvidiousAPIClient
     {
         private readonly Dictionary<string, KeyValuePair<DateTime, HttpResponseMessage>> _httpResponseCache;
-        private readonly int _expireTicks = 1000 * 60 * 5;
+        private readonly int _expireTicks = 10000 * 60 * 5;
         private readonly int _chunkSize;
         private readonly int _failureTolerance = 5;
         private readonly ILogger _logger;
@@ -169,7 +169,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
                     // This will never add duplicate entries. If the
                     // key already exists, this method would have
                     // returned in the first conditional.
-                    _httpResponseCache.Add(absolutePath, new KeyValuePair<DateTime, HttpResponseMessage> (DateTime.Now, message));
+                    _httpResponseCache[absolutePath] new KeyValuePair<DateTime, HttpResponseMessage>(DateTime.Now, message);
                     await _logger.Trace("Adding to the http response cache: " + url);
                 }
             }
