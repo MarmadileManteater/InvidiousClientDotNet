@@ -19,7 +19,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
     public class InvidiousAPIClient : IInvidiousAPIClient
     {
         private readonly Dictionary<string, KeyValuePair<DateTime, HttpResponseMessage>> _httpResponseCache;
-        private readonly int _expireTicks = 10000 * 60 * 5;
+        private readonly int _expireMinutes = 60;
         private readonly int _chunkSize;
         private readonly int _failureTolerance = 5;
         private readonly ILogger _logger;
@@ -109,7 +109,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
             // If there is an entry in the cache for this url,
             // we don't need to check if cache is enabled because
             // the cache will always be empty if it is disabled.
-            if (_httpResponseCache.ContainsKey(absolutePath) && _httpResponseCache[absolutePath].Key.Ticks + _expireTicks > DateTime.Now.Ticks)
+            if (_httpResponseCache.ContainsKey(absolutePath) && ((DateTime.Now - _httpResponseCache[absolutePath].Key).TotalMinutes <= _expireMinutes))
             {
                 return _httpResponseCache[absolutePath].Value;
             }
