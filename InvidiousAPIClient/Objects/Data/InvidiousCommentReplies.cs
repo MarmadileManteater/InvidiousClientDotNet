@@ -47,16 +47,34 @@ namespace MarmadileManteater.InvidiousClient.Objects.Data
                 return "";
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="Exception">If Continuation is ""</exception>
         public async Task<InvidiousComments> FetchContinuation()
         {
-            JToken? response = await _client.FetchJSON(_videoId + "?continuation=" + _data["continuation"]?.Value<string?>(), "comments");
-            JObject? jObject = response?.Value<JObject>();
-            if (jObject == null)
+            JObject? jObject;
+            if (Continuation != "")
             {
-                jObject = new JObject();
+                JToken? response = await _client.FetchJSON(_videoId + "?continuation=" + Continuation, "comments");
+                jObject = response?.Value<JObject>();
+                if (jObject == null)
+                {
+                    jObject = new JObject();
+                }
+            } 
+            else
+            {
+                throw new Exception("No continuation to fetch.");
             }
             return new InvidiousComments(jObject, _client);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="Exception">If Continuation is ""</exception>
         public InvidiousComments FetchContinuationSync()
         {
             Task<InvidiousComments> task = FetchContinuation();
