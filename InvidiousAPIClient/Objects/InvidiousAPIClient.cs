@@ -704,5 +704,24 @@ namespace MarmadileManteater.InvidiousClient.Objects
             task.Wait();
             return task.Result;
         }
+        /// <inheritdoc/>
+        public async Task<InvidiousComments> FetchCommentsByVideoId(string videoId)
+        {
+            InvidiousComments result = new(null, this);
+            JToken response = await FetchJSON(videoId, "comments");
+            JObject? commentsJObject = response.Value<JObject>();
+            if (commentsJObject != null)
+            {
+                result = new(commentsJObject, this);
+            }
+            return result;
+        }
+        /// <inheritdoc/>
+        public InvidiousComments FetchCommentsByVideoIdSync(string videoId)
+        {
+            Task<InvidiousComments> task = FetchCommentsByVideoId(videoId);
+            task.Wait();
+            return task.Result;
+        }
     }
 }

@@ -197,5 +197,17 @@ namespace MarmadileManteater.InvidiousClient.Interfaces
         /// <param name="partialQuery">the partially typed query</param>
         /// <returns></returns>
         IList<string> SearchSuggestionsSync(string partialQuery);
+        /// <summary>
+        /// Returns the associated comments object for the given video id
+        /// </summary>
+        /// <param name="videoId"></param>
+        /// <returns></returns>
+        Task<InvidiousComments> FetchCommentsByVideoId(string videoId);
+        /// <summary>
+        /// Returns the associated comments object for the given video id
+        /// </summary>
+        /// <param name="videoId"></param>
+        /// <returns></returns>
+        InvidiousComments FetchCommentsByVideoIdSync(string videoId);
     }
 }
