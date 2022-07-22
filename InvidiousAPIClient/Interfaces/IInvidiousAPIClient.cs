@@ -9,6 +9,9 @@ using Newtonsoft.Json.Linq;
 
 namespace MarmadileManteater.InvidiousClient.Interfaces
 {
+    /// <summary>
+    /// An interface for the abstracting calls to the invidious API
+    /// </summary>
     public interface IInvidiousAPIClient
     {
         /// <summary>
@@ -182,5 +185,17 @@ namespace MarmadileManteater.InvidiousClient.Interfaces
         /// <param name="region"></param>
         /// <returns>search results</returns>
         IList<JObject> SearchSync(string query, int page = 0, SortBy? sortBy = null, DateRange? date = null, Duration? duration = null, SearchType? searchType = null, Feature[]? features = null, string? region = null);
+        /// <summary>
+        /// Retrieves a list of suggested search results
+        /// </summary>
+        /// <param name="partialQuery">the partially typed query</param>
+        /// <returns></returns>
+        Task<IList<string>> SearchSuggestions(string partialQuery);
+        /// <summary>
+        /// Retrieves a list of suggested search results
+        /// </summary>
+        /// <param name="partialQuery">the partially typed query</param>
+        /// <returns></returns>
+        IList<string> SearchSuggestionsSync(string partialQuery);
     }
 }

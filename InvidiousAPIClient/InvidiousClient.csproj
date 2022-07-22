@@ -15,7 +15,7 @@
     <RepositoryUrl>https://github.com/MarmadileManteater/InvidiousClientDotNet.git</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
     <Authors>MarmadileManteater</Authors>
-    <Version>1.1</Version>
+    <Version>1.2</Version>
     <PackageIcon>invidious.png</PackageIcon>
     <!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -49,7 +49,7 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>

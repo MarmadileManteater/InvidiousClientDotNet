@@ -674,5 +674,35 @@ namespace MarmadileManteater.InvidiousClient.Objects
             task.Wait();
             return task.Result;
         }
+        /// <inheritdoc/>
+        public async Task<IList<string>> SearchSuggestions(string partialQuery)
+        {
+            IList<string> result = new List<string>();
+            JToken response = await FetchJSON("suggestions?q=" + partialQuery, "search");
+            JObject? searchSuggestionsObject = response.Value<JObject>();
+            if (searchSuggestionsObject != null)
+            {
+                JArray? suggestions = searchSuggestionsObject["suggestions"]?.Value<JArray>();
+                if (suggestions != null)
+                {
+                    foreach (JToken suggestion in suggestions)
+                    {
+                        string? deserializedSuggestion = suggestion?.Value<string>();
+                        if (deserializedSuggestion != null)
+                        {
+                            result.Add(deserializedSuggestion);
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+        /// <inheritdoc/>
+        public IList<string> SearchSuggestionsSync(string partialQuery)
+        {
+            Task<IList<string>> task = SearchSuggestions(partialQuery);
+            task.Wait();
+            return task.Result;
+        }
     }
 }
