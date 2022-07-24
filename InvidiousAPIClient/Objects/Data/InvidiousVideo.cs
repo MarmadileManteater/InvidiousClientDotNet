@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MarmadileManteater.InvidiousClient.Extensions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace MarmadileManteater.InvidiousClient.Objects.Data
@@ -19,6 +20,21 @@ namespace MarmadileManteater.InvidiousClient.Objects.Data
             }
             _data = instanceObject;
         }
+
+        /// <summary>
+        /// Gets the inner JObject data from the video
+        /// </summary>
+        /// <returns></returns>
+        public JObject GetData()
+        {
+            JObject? data = JsonConvert.DeserializeObject<JObject>(JsonConvert.SerializeObject(_data));
+            if (data != null)
+            {
+                return data;
+            }
+            return new JObject();
+        }
+
         public string Title
         {
             get

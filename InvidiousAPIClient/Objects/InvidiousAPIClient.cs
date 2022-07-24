@@ -18,7 +18,8 @@ namespace MarmadileManteater.InvidiousClient.Objects
     /// </summary>
     public class InvidiousAPIClient : IInvidiousAPIClient
     {
-        private readonly Dictionary<string, HttpResponseMessage> _httpResponseCache;
+        private readonly Dictionary<string, KeyValuePair<DateTime, HttpResponseMessage>> _httpResponseCache;
+        private readonly int _expireMinutes = 60;
         private readonly int _chunkSize;
         private readonly int _failureTolerance = 5;
         private readonly ILogger _logger;
@@ -39,7 +40,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
         /// <param name="defaultServer">if given will make requests out to this server first, and it will still fallback to a random instance if this instance fails</param>
         public InvidiousAPIClient(bool cacheEnabled, ILogger logger, int failureTolerance = 5, string? defaultServer = null)
         {
-            _httpResponseCache = new Dictionary<string, HttpResponseMessage>();
+            _httpResponseCache = new Dictionary<string, KeyValuePair<DateTime, HttpResponseMessage>>();
             CacheEnabled = cacheEnabled;
             _logger = logger;
             _chunkSize = 8192;
@@ -56,7 +57,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
         /// <param name="defaultServer"></param>
         public InvidiousAPIClient(bool cacheEnabled, ILogger logger, string defaultServer)
         {
-            _httpResponseCache = new Dictionary<string, HttpResponseMessage>();
+            _httpResponseCache = new Dictionary<string, KeyValuePair<DateTime, HttpResponseMessage>>();
             CacheEnabled = cacheEnabled;
             _logger = logger;
             _chunkSize = 8192;
@@ -71,7 +72,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
         /// <param name="defaultServer"></param>
         public InvidiousAPIClient(bool cacheEnabled, string defaultServer)
         {
-            _httpResponseCache = new Dictionary<string, HttpResponseMessage>();
+            _httpResponseCache = new Dictionary<string, KeyValuePair<DateTime, HttpResponseMessage>>();
             CacheEnabled = cacheEnabled;
             _logger = new ConsoleLogger();
             _chunkSize = 8192;
@@ -87,7 +88,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
         /// <param name="defaultServer"></param>
         public InvidiousAPIClient(bool cacheEnabled = true, int failureTolerance = 5, string? defaultServer = null)
         {
-            _httpResponseCache = new Dictionary<string, HttpResponseMessage>();
+            _httpResponseCache = new Dictionary<string, KeyValuePair<DateTime, HttpResponseMessage>>();
             CacheEnabled = cacheEnabled;
             _logger = new ConsoleLogger();
             _chunkSize = 8192;
@@ -108,9 +109,9 @@ namespace MarmadileManteater.InvidiousClient.Objects
             // If there is an entry in the cache for this url,
             // we don't need to check if cache is enabled because
             // the cache will always be empty if it is disabled.
-            if (_httpResponseCache.ContainsKey(absolutePath))
+            if (_httpResponseCache.ContainsKey(absolutePath) && ((DateTime.Now - _httpResponseCache[absolutePath].Key).TotalMinutes <= _expireMinutes))
             {
-                return _httpResponseCache[absolutePath];
+                return _httpResponseCache[absolutePath].Value;
             }
 
             // If the client parameter is null,
@@ -168,7 +169,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
                     // This will never add duplicate entries. If the
                     // key already exists, this method would have
                     // returned in the first conditional.
-                    _httpResponseCache.Add(absolutePath, message);
+                    _httpResponseCache[absolutePath] = new KeyValuePair<DateTime, HttpResponseMessage>(DateTime.Now, message);
                     await _logger.Trace("Adding to the http response cache: " + url);
                 }
             }
@@ -670,6 +671,55 @@ namespace MarmadileManteater.InvidiousClient.Objects
         public IList<JObject> SearchSync(string query, int page = 0, SortBy? sortBy = null, DateRange? date = null, Duration? duration = null, SearchType? searchType = null, Feature[]? features = null, string? region = null)
         {
             Task<IList<JObject>> task = Search(query, page, sortBy, date, duration, searchType, features);
+            task.Wait();
+            return task.Result;
+        }
+        /// <inheritdoc/>
+        public async Task<IList<string>> SearchSuggestions(string partialQuery)
+        {
+            IList<string> result = new List<string>();
+            JToken response = await FetchJSON("suggestions?q=" + partialQuery, "search");
+            JObject? searchSuggestionsObject = response.Value<JObject>();
+            if (searchSuggestionsObject != null)
+            {
+                JArray? suggestions = searchSuggestionsObject["suggestions"]?.Value<JArray>();
+                if (suggestions != null)
+                {
+                    foreach (JToken suggestion in suggestions)
+                    {
+                        string? deserializedSuggestion = suggestion?.Value<string>();
+                        if (deserializedSuggestion != null)
+                        {
+                            result.Add(deserializedSuggestion);
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+        /// <inheritdoc/>
+        public IList<string> SearchSuggestionsSync(string partialQuery)
+        {
+            Task<IList<string>> task = SearchSuggestions(partialQuery);
+            task.Wait();
+            return task.Result;
+        }
+        /// <inheritdoc/>
+        public async Task<InvidiousComments> FetchCommentsByVideoId(string videoId)
+        {
+            InvidiousComments result = new(null, this);
+            JToken response = await FetchJSON(videoId, "comments");
+            JObject? commentsJObject = response.Value<JObject>();
+            if (commentsJObject != null)
+            {
+                result = new(commentsJObject, this);
+            }
+            return result;
+        }
+        /// <inheritdoc/>
+        public InvidiousComments FetchCommentsByVideoIdSync(string videoId)
+        {
+            Task<InvidiousComments> task = FetchCommentsByVideoId(videoId);
             task.Wait();
             return task.Result;
         }
