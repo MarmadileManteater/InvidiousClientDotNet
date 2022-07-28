@@ -69,8 +69,10 @@ jobs:
         draft: true
         prerelease: false
         body_path: release.txt
-    - name: action-zip
-      uses: montudor/action-zip@v1.0.0
+    - name: Install zip
+      uses: montudor/action-zip@v1
+
+    - name: Zip Release
       run: zip -qq -r release.zip net6.0
       working-directory: InvidiousAPIClient/bin/Release
 
