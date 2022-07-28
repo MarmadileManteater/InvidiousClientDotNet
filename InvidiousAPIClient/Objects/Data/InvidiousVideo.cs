@@ -429,8 +429,10 @@ namespace MarmadileManteater.InvidiousClient.Objects.Data
                 {
                     foreach (JObject caption in captions)
                     {
+                        caption["_server"] = _data["_server"];
                         result.Add(new InvidiousCaption(caption));
                     }
+                    _data["captions"] = captions;
                 }
 
                 return result;

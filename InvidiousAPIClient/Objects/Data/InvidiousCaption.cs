@@ -46,10 +46,11 @@ namespace MarmadileManteater.InvidiousClient.Objects.Data
         {
             get
             {
+                string? server = _data["_server"]?.Value<string>();
                 string? result = _data["url"]?.Value<string>();
-                if (result != null)
+                if (server != null && result != null)
                 {
-                    return result;
+                    return server + result;
                 }
                 return "";
             }
