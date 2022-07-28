@@ -69,6 +69,10 @@ jobs:
         draft: true
         prerelease: false
         body_path: release.txt
+    - name: action-zip
+      uses: montudor/action-zip@v1.0.0
+      run: zip -qq -r release.zip net6.0
+      working-directory: InvidiousAPIClient/bin/Release
 
     - name: Upload DLL artifact to release
       uses: actions/upload-release-asset@v1.0.1
@@ -76,9 +80,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: InvidiousAPIClient/bin/Release/net6.0/InvidiousClient.dll
-        asset_name: InvidiousClient.${{ steps.get_version.outputs.RELEASE_VERSION }}.dll
-        asset_content_type: application/dll
+        asset_path: InvidiousAPIClient/bin/Release/release.zip
+        asset_name: InvidiousClient.${{ steps.get_version.outputs.RELEASE_VERSION }}.zip
+        asset_content_type: application/zip
 
     - name: Upload Nuget artifact to release
       uses: actions/upload-release-asset@v1.0.1
