@@ -392,6 +392,28 @@ namespace MarmadileManteater.InvidiousClient.Objects
             {
                 throw new Exception("Response was null");
             }
+            try
+            {
+                JObject? resultAsJObject = result.Value<JObject>();
+                if (resultAsJObject != null)
+                {
+                    resultAsJObject.Add("_server", server);
+                }
+                JToken? newResult = resultAsJObject?.Value<JToken>();
+                if (newResult != null)
+                {
+                    return newResult;
+                }
+                else
+                {
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                // 
+            }
             return result;
         }
         /// <inheritdoc />
