@@ -260,6 +260,18 @@ namespace MarmadileManteater.InvidiousClient.Objects
                             await _logger.Trace("Refetching a new stream url for video id: " + videoId);
                             video = await FetchVideoById(videoId, new string[] { "formatStreams", "adaptiveFormats" });
                         }
+                        finally
+                        {
+                            try
+                            {
+                                // Dispose the progress if we can
+                                ((IDisposable)progress).Dispose();
+                            }
+                            catch
+                            {
+                                // this could throw even when everything works
+                            }
+                        }
                     } while (connectionFailed && failedAttempts < _failureTolerance);
                     if (failedAttempts > _failureTolerance)
                     {
