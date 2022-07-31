@@ -148,7 +148,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
             try
             {
                 message = await client.GetAsync(requestUrl, HttpCompletionOption.ResponseHeadersRead);
-            } 
+            }
             catch (Exception error)
             {
                 message = new HttpResponseMessage
@@ -164,7 +164,8 @@ namespace MarmadileManteater.InvidiousClient.Objects
             if (CacheEnabled && message.IsSuccessStatusCode)
             {
                 string? contentType = message.Content.Headers.ContentType?.ToString();
-                if (contentType != null && !contentType.Contains("video") && !contentType.Contains("audio")) {
+                if (contentType != null && !contentType.Contains("video") && !contentType.Contains("audio"))
+                {
                     // Add the entry to the cache
                     // This will never add duplicate entries. If the
                     // key already exists, this method would have
@@ -337,7 +338,8 @@ namespace MarmadileManteater.InvidiousClient.Objects
                 server = _defaultServer;
             }
             // if default server is null
-            if (server == null) {
+            if (server == null)
+            {
                 IList<string> apis = await GetInvidiousAPIs();
                 Random random = new();
                 int randomIndex = random.Next(apis.Count);
@@ -369,10 +371,11 @@ namespace MarmadileManteater.InvidiousClient.Objects
             {
 
                 path += startCharacter + "fields=" + string.Join(',', fields) + "&pretty=1";
-            } else
+            }
+            else
             {
                 path += startCharacter + "pretty=1";
-            
+
             }
 
             HttpResponseMessage response = await Fetch(server + "/api/v1/" + path);
@@ -387,7 +390,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
                 catch (Exception exception)
                 {
                     await _logger.LogError("Failed to fetch from the invidious API", exception);
-                    
+
                     failedAttempts++;
                     if (failedAttempts < _failureTolerance)
                     {// if failure attempts within error tolerance
@@ -557,7 +560,40 @@ namespace MarmadileManteater.InvidiousClient.Objects
         public async Task<InvidiousPlaylist> FetchPlaylistById(string id, string[]? fields = null)
         {
             JObject? playlistObject = (await FetchJSON(id, "playlists", fields))?.Value<JObject>();
-            return new InvidiousPlaylist(playlistObject);
+            InvidiousPlaylist playlist = new(playlistObject);
+            var i = 2;
+            bool keepGoing = playlist.VideoCount > playlist.Videos.Count;
+            while (keepGoing)
+            {
+                // Not all videos fetched yet
+                JObject? innerPlaylistObject = (await FetchJSON($"{id}?page={i}", "playlists", fields))?.Value<JObject>();
+                InvidiousPlaylist innerPlaylist = new(innerPlaylistObject);
+                IEnumerable<InvidiousPlaylistVideo> results = innerPlaylist.Videos.Where(video => !playlist.Videos.Where(playlistVideo => playlistVideo.VideoId == video.VideoId).Any());
+                bool anyAdded = results.Any();
+                JArray? videos = playlistObject?["videos"]?.Value<JArray>();
+                if (videos == null)
+                {
+                    videos = new JArray();
+                }
+                foreach (InvidiousPlaylistVideo video in results)
+                {
+                    videos.Add(video.GetData());
+                }
+                if (playlistObject != null)
+                {
+                    playlistObject["videos"] = videos;
+                }
+                if (!anyAdded)
+                {
+                    keepGoing = false;
+                }
+                if (playlist.VideoCount <= playlist.Videos.Count)
+                {
+                    keepGoing = false;
+                }
+                i++;
+            }
+            return new(playlistObject);
         }
         /// <inheritdoc />
         public InvidiousPlaylist FetchPlaylistByIdSync(string id, string[]? fields = null)
@@ -574,7 +610,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
             if (sortBy != null)
             {
                 queryInterjection += "&sort_by=";
-                switch(sortBy)
+                switch (sortBy)
                 {
                     case SortBy.Relevance:
                         queryInterjection += "relevance";

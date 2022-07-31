@@ -121,6 +121,18 @@ namespace MarmadileManteater.InvidiousClient.Objects.Data
                 return 0;
             }
         }
+        public int VideoCount
+        {
+            get
+            {
+                int? result = _data["videoCount"]?.Value<int>();
+                if (result != null)
+                {
+                    return result.Value;
+                }
+                return 0;
+            }
+        }
         public string Description
         {
             get
