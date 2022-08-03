@@ -424,10 +424,9 @@ namespace MarmadileManteater.InvidiousClient.Objects
                     return result;
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine(ex.Message);
-                // 
+                // quietly catch this because it isn't a real error. This just adds a _server field to objects retrieved from the API. This doesn't work for JArrays obviously.
             }
             return result;
         }
