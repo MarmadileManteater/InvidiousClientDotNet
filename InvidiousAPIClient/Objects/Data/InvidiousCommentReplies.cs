@@ -47,23 +47,26 @@ namespace MarmadileManteater.InvidiousClient.Objects.Data
                 return "";
             }
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="Exception">If Continuation is ""</exception>
-        public async Task<InvidiousComments> FetchContinuation()
+        private async Task<InvidiousComments> FetchContinuationOptionalSync(bool sync = false)
         {
             JObject? jObject;
             if (Continuation != "")
             {
-                JToken? response = await _client.FetchJSON(_videoId + "?continuation=" + Continuation, "comments");
+                JToken? response;
+                if (!sync)
+                {
+                    response = await _client.FetchJSON(_videoId + "?continuation=" + Continuation, "comments");
+                }
+                else
+                {
+                    response = _client.FetchJSONSync(_videoId + "?continuation=" + Continuation, "comments");
+                }
                 jObject = response?.Value<JObject>();
                 if (jObject == null)
                 {
                     jObject = new JObject();
                 }
-            } 
+            }
             else
             {
                 throw new Exception("No continuation to fetch.");
@@ -75,11 +78,18 @@ namespace MarmadileManteater.InvidiousClient.Objects.Data
         /// </summary>
         /// <returns></returns>
         /// <exception cref="Exception">If Continuation is ""</exception>
+        public async Task<InvidiousComments> FetchContinuation()
+        {
+            return await FetchContinuationOptionalSync(false);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="Exception">If Continuation is ""</exception>
         public InvidiousComments FetchContinuationSync()
         {
-            Task<InvidiousComments> task = FetchContinuation();
-            task.Wait();
-            return task.Result;
+            return FetchContinuationOptionalSync(true).GetAwaiter().GetResult();
         }
     }
 }

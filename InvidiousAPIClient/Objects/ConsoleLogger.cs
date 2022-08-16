@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using MarmadileManteater.InvidiousClient.Enums;
@@ -10,7 +11,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
 {
     public class ConsoleLogger : ILogger
     {
-        public Task Log(string message, LogLevel level, Exception? exception)
+        public void LogSync(string message, LogLevel level, Exception? exception)
         {
             ConsoleColor previousBackground = Console.BackgroundColor;
             ConsoleColor previousForeground = Console.ForegroundColor;
@@ -38,6 +39,11 @@ namespace MarmadileManteater.InvidiousClient.Objects
             }
             Console.BackgroundColor = previousBackground;
             Console.ForegroundColor = previousForeground;
+        }
+
+        public Task Log(string message, LogLevel level, Exception? exception)
+        {
+            LogSync(message, level, exception);
             return Task.CompletedTask;
         }
 
@@ -48,7 +54,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
 
         public void LogErrorSync(string message, Exception exception)
         {
-            LogError(message, exception).Wait();
+            LogSync(message, LogLevel.Error, exception);
         }
 
         public async Task LogInfo(string message)
@@ -58,12 +64,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
 
         public void LogInfoSync(string message)
         {
-            LogInfo(message).Wait();
-        }
-
-        public void LogSync(string message, LogLevel level, Exception? exception)
-        {
-            Log(message, level, exception).Wait();
+            LogSync(message, LogLevel.Information, null);
         }
 
         public async Task LogWarn(string message, Exception? exception)
@@ -73,7 +74,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
 
         public void LogWarnSync(string message, Exception? exception)
         {
-            LogWarn(message, exception).Wait();
+            LogSync(message, LogLevel.Warning, exception);
         }
 
         public async Task Trace(string message)
@@ -83,7 +84,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
 
         public void TraceSync(string message)
         {
-            Trace(message).Wait();
+            LogSync(message, LogLevel.Trace, null);
         }
         public IProgress<double> GetProgressInterface()
         {
