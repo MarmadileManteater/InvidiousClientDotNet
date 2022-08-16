@@ -797,7 +797,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
             }
             if (region != null)
             {
-                queryInterjection += "&region=" + region;
+                queryInterjection += $"&region={region}";
             }
             JToken response = await FetchJSONOptionalSync($"?q={Uri.EscapeDataString(query)}&page={page}{queryInterjection}", "search", null, null, sync);
             JArray? searchList = response.Value<JArray>();
@@ -850,7 +850,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
         /// <inheritdoc/>
         public IList<string> SearchSuggestionsSync(string partialQuery)
         {
-            return SearchSuggestionsOptionalSync(partialQuery, false).GetAwaiter().GetResult();
+            return SearchSuggestionsOptionalSync(partialQuery, true).GetAwaiter().GetResult();
         }
         private async Task<InvidiousComments> FetchCommentsByVideoIdOptionalSync(string videoId, bool sync)
         {
