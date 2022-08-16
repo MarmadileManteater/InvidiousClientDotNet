@@ -850,7 +850,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
         /// <inheritdoc/>
         public IList<string> SearchSuggestionsSync(string partialQuery)
         {
-            return SearchSuggestionsOptionalSync(partialQuery, false).GetAwaiter().GetResult();
+            return SearchSuggestionsOptionalSync(partialQuery, true).GetAwaiter().GetResult();
         }
         private async Task<InvidiousComments> FetchCommentsByVideoIdOptionalSync(string videoId, bool sync)
         {
