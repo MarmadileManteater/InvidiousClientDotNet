@@ -9,7 +9,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/MarmadileManteater/InvidiousClientDotNet</PackageProjectUrl>
-    <Copyright>MIT License Copyright (c) 2022 MarmadileManteater</Copyright>
+
     <Description>A library which allows you to easily interface with the Invidious API using .NET 6.0 </Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/MarmadileManteater/InvidiousClientDotNet.git</RepositoryUrl>
