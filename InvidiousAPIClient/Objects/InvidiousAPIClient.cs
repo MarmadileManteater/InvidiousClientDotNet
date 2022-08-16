@@ -797,7 +797,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
             }
             if (region != null)
             {
-                queryInterjection += "&region=" + region;
+                queryInterjection += $"&region={region}";
             }
             JToken response = await FetchJSONOptionalSync($"?q={Uri.EscapeDataString(query)}&page={page}{queryInterjection}", "search", null, null, sync);
             JArray? searchList = response.Value<JArray>();
