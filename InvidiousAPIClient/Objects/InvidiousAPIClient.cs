@@ -230,7 +230,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
                         {
 
                         }
-                        string fileName = Path.Join(saveDirectory, videoId, videoId + "_" + stream.Itag + "." + fileType);
+                        string fileName = Path.Join(saveDirectory, videoId, $"{videoId}_{stream.Itag}.{fileType}");
 
                         // this section is adapted from code from this github post:
                         // https://github.com/dotnet/runtime/issues/16681#issuecomment-195980023
@@ -316,7 +316,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
                     } while (connectionFailed && failedAttempts < _failureTolerance);
                     if (failedAttempts > _failureTolerance)
                     {
-                        throw new Exception("Failed to download " + _failureTolerance + " consecutive times!");
+                        throw new Exception($"Failed to download {_failureTolerance} consecutive times!");
                     }
                 }
             }
@@ -401,13 +401,13 @@ namespace MarmadileManteater.InvidiousClient.Objects
 
             if (!server.StartsWith("https://"))
             {
-                server = "https://" + server;
+                server = $"https://{server}";
             }
 
             string path = urlPath;
             if (type != null)
             {
-                path = type + "/" + urlPath;
+                path = $"{type}/{urlPath}";
             }
 
             char startCharacter = '?';
@@ -417,21 +417,20 @@ namespace MarmadileManteater.InvidiousClient.Objects
             }
             if (fields != null)
             {
-
-                path += startCharacter + "fields=" + string.Join(',', fields) + "&pretty=1";
+                string fieldString = string.Join(',', fields);
+                path += $"{startCharacter}fields={fieldString}&pretty=1";
             }
             else
             {
-                path += startCharacter + "pretty=1";
-
+                path += $"{startCharacter}pretty=1";
             }
 
-            HttpResponseMessage response = await FetchOptionalSync(server + "/api/v1/" + path, null, sync);
+            HttpResponseMessage response = await FetchOptionalSync($"{server}/api/v1/{path}", null, sync);
             while (!response.IsSuccessStatusCode && failedAttempts < _failureTolerance)
             {
                 try
                 {
-                    response = await FetchOptionalSync(server + "/api/v1/" + path, null, sync);
+                    response = await FetchOptionalSync($"{server}/api/v1/{path}", null, sync);
                     response.EnsureSuccessStatusCode();
                     failedAttempts = 0;
                 }
@@ -609,7 +608,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
         private async Task<IList<InvidiousChannelVideo>> FetchVideosByChannelIdOptionalSync(string channelId, bool sync = false)
         {
             List<InvidiousChannelVideo> result = new();
-            JArray? channelList = (await FetchJSONOptionalSync(channelId + "/videos", "channels", null, null, sync)).Value<JArray>();
+            JArray? channelList = (await FetchJSONOptionalSync($"{channelId}/videos", "channels", null, null, sync)).Value<JArray>();
             if (channelList != null)
             {
                 foreach (JObject video in channelList)
@@ -800,7 +799,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
             {
                 queryInterjection += "&region=" + region;
             }
-            JToken response = await FetchJSONOptionalSync("?q=" + Uri.EscapeDataString(query) + "&page=" + page.ToString() + queryInterjection, "search", null, null, sync);
+            JToken response = await FetchJSONOptionalSync($"?q={Uri.EscapeDataString(query)}&page={page}{queryInterjection}", "search", null, null, sync);
             JArray? searchList = response.Value<JArray>();
             if (searchList != null)
             {
