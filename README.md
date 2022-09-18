@@ -91,7 +91,6 @@ An library which allows you to easily interface with the [Invidious](https://git
             Console.WriteLine("\t\t" + playlist.PlaylistId)
             Console.WriteLine("\t\t" + playlist.Title)
             Console.WriteLine("\t\t" + playlist.Author)
-    done
 ```
 
 ## Output
