@@ -50,7 +50,14 @@ namespace MarmadileManteater.InvidiousClient.Objects.Data
                 string? result = _data["url"]?.Value<string>();
                 if (server != null && result != null)
                 {
-                    return server + result;
+                    if (!server.StartsWith("https://") && !server.StartsWith("http://"))
+                    {
+                        return $"{server}{result}";
+                    }
+                    else
+                    {
+                        return result;
+                    }
                 }
                 return "";
             }
