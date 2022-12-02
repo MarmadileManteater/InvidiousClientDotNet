@@ -394,12 +394,7 @@ namespace MarmadileManteater.InvidiousClient.Objects
                 server = apis[randomIndex];
             }
 
-            if (server.StartsWith("http://"))
-            {
-                server = server.Replace("http://", "https://");
-            }
-
-            if (!server.StartsWith("https://"))
+            if (!server.StartsWith("https://") && !server.StartsWith("http://"))
             {
                 server = $"https://{server}";
             }
